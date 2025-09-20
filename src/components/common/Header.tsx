@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Home, User, Settings, Menu } from 'lucide-react';
 import { ROUTES } from '@/constants';
+import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -14,21 +15,29 @@ const HeaderContainer = styled.header`
   justify-content: space-between;
   padding: 1rem 1.5rem;
   background: ${({ theme }) => theme.colors.background.primary};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
   box-shadow: ${({ theme }) => theme.shadows.SM};
   position: sticky;
   top: 0;
   z-index: 100;
+  
+  ${media.max.sm`
+    padding: 0.75rem 1rem;
+  `}
 `;
 
 const Logo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: ${({ theme }) => theme.fonts.size['2XL']};
+  ${responsiveTypography.h2}
   font-weight: 700;
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
+  
+  ${media.max.sm`
+    gap: 0.25rem;
+  `}
 `;
 
 const LogoIcon = styled.div`
@@ -41,6 +50,11 @@ const LogoIcon = styled.div`
   justify-content: center;
   color: white;
   font-weight: bold;
+  
+  ${media.max.sm`
+    width: 1.75rem;
+    height: 1.75rem;
+  `}
 `;
 
 const Navigation = styled.nav`
@@ -48,9 +62,9 @@ const Navigation = styled.nav`
   align-items: center;
   gap: 1rem;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.MD}) {
+  ${media.max.md`
     display: none;
-  }
+  `}
 `;
 
 const NavItem = styled.a<{ active?: boolean }>`
@@ -59,7 +73,7 @@ const NavItem = styled.a<{ active?: boolean }>`
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
-  color: ${({ theme, active }) => active ? theme.colors.primary : theme.colors.gray[500]};
+  color: ${({ theme, active }) => active ? theme.colors.primary : theme.colors.text.secondary};
   background: ${({ theme, active }) => active ? theme.colors.gray[50] : 'transparent'};
   text-decoration: none;
   font-weight: 500;
@@ -76,11 +90,10 @@ const MobileMenuButton = styled.button`
   display: none;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  ${touchFriendly}
   border: none;
   background: transparent;
-  color: ${({ theme }) => theme.colors.gray[500]};
+  color: ${({ theme }) => theme.colors.text.secondary};
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   cursor: pointer;
   transition: ${({ theme }) => theme.transitions.FAST};
@@ -90,9 +103,9 @@ const MobileMenuButton = styled.button`
     color: ${({ theme }) => theme.colors.primary};
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.MD}) {
+  ${media.max.md`
     display: flex;
-  }
+  `}
 `;
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick, showMenuButton = true }) => {

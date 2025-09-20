@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { notify } from '@/services/notificationService';
 import MainLayout from '@/components/common/MainLayout';
@@ -6,13 +6,20 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import CoinRecommendationCard from '@/components/cards/CoinRecommendationCard';
 import UserProfileSummary from '@/components/cards/UserProfileSummary';
 import MarketSummary from '@/components/cards/MarketSummary';
+import RealTimeIndicator from '@/components/common/RealTimeIndicator';
 import { useDashboardData } from '@/hooks/useApi';
+import { useRealTimeData, useNetworkStatus } from '@/hooks/useRealTimeData';
+import { media, responsiveTypography, responsiveSpacing } from '@/utils/responsive';
 import type { CoinRecommendation } from '@/types';
 
 const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  
+  ${media.max.sm`
+    gap: 1.5rem;
+  `}
 `;
 
 const WelcomeSection = styled.div`
@@ -21,16 +28,20 @@ const WelcomeSection = styled.div`
   padding: 2rem;
   border-radius: ${({ theme }) => theme.borderRadius.LG};
   text-align: center;
+  
+  ${media.max.sm`
+    padding: 1.5rem 1rem;
+  `}
 `;
 
 const WelcomeTitle = styled.h2`
-  font-size: ${({ theme }) => theme.fonts.size['2XL']};
+  ${responsiveTypography.h2}
   font-weight: 700;
   margin: 0 0 1rem 0;
 `;
 
 const WelcomeDescription = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.LG};
+  ${responsiveTypography.body}
   margin: 0;
   opacity: 0.9;
 `;
@@ -39,6 +50,11 @@ const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
+  
+  ${media.max.sm`
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  `}
 `;
 
 const RecommendationsGrid = styled.div`
@@ -46,16 +62,26 @@ const RecommendationsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+  
+  ${media.max.sm`
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  `}
 `;
 
 const SectionTitle = styled.h2`
-  font-size: ${({ theme }) => theme.fonts.size['2XL']};
+  ${responsiveTypography.h2}
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.gray[900]};
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 1rem 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  
+  ${media.max.sm`
+    margin: 0 0 0.75rem 0;
+  `}
 `;
 
 const ErrorMessage = styled.div`
@@ -65,11 +91,44 @@ const ErrorMessage = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   text-align: center;
   font-weight: 500;
+  
+  ${media.max.sm`
+    padding: 0.75rem;
+  `}
 `;
 
 const Dashboard: React.FC = () => {
-  const { data: dashboardData, isLoading, error } = useDashboardData();
+  const { data: dashboardData, isLoading, error, isFetching } = useDashboardData();
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
+  
+  // 실시간 데이터 및 네트워크 상태 훅
+  const { startDashboardUpdates, stopRealTimeUpdates } = useRealTimeData();
+  const { isOnline, connectionType } = useNetworkStatus();
+
+  // 실시간 업데이트 시작
+  useEffect(() => {
+    if (isOnline) {
+      startDashboardUpdates(
+        'user123',
+        (newRecommendation) => {
+          console.log('New recommendation received:', newRecommendation);
+          setLastUpdateTime(new Date());
+        }
+      );
+    }
+
+    return () => {
+      stopRealTimeUpdates();
+    };
+  }, [isOnline, startDashboardUpdates, stopRealTimeUpdates]);
+
+  // 데이터 업데이트 시 시간 갱신
+  useEffect(() => {
+    if (dashboardData && !isLoading) {
+      setLastUpdateTime(new Date());
+    }
+  }, [dashboardData, isLoading]);
 
   const handleAddToWatchlist = (coinId: string) => {
     setWatchlist(prev => {
@@ -141,6 +200,13 @@ const Dashboard: React.FC = () => {
       description="AI가 추천하는 오늘의 코인을 확인해보세요"
     >
       <DashboardContainer>
+        <RealTimeIndicator
+          isOnline={isOnline}
+          isRefreshing={isFetching}
+          lastUpdateTime={lastUpdateTime}
+          connectionType={connectionType}
+        />
+        
         <WelcomeSection>
           <WelcomeTitle>🤖 AI가 추천하는 오늘의 코인</WelcomeTitle>
           <WelcomeDescription>

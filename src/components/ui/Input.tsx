@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 import { Eye, EyeOff } from 'lucide-react';
+import { touchFriendlyInput, touchFriendlyButton, touchFocus } from '@/utils/touch';
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;
@@ -62,6 +63,10 @@ const InputField = styled.input<{
   font-family: ${({ theme }) => theme.fonts.family.primary};
   color: ${({ theme }) => theme.colors.text.primary};
   transition: ${({ theme }) => theme.transitions.FAST};
+  
+  /* 터치 친화적 스타일 적용 */
+  ${touchFriendlyInput}
+  ${touchFocus}
 
   &::placeholder {
     color: ${({ theme }) => theme.colors.text.tertiary};
@@ -126,15 +131,14 @@ const PasswordToggle = styled.button`
   padding: 0.25rem;
   border-radius: ${({ theme }) => theme.borderRadius.SM};
   transition: ${({ theme }) => theme.transitions.FAST};
+  
+  /* 터치 친화적 스타일 적용 */
+  ${touchFriendlyButton}
+  ${touchFocus}
 
   &:hover {
     color: ${({ theme }) => theme.colors.text.secondary};
     background: ${({ theme }) => theme.colors.gray[100]};
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.border.focus};
-    outline-offset: 2px;
   }
 `;
 

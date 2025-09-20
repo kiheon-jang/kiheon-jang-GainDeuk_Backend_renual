@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Loader2 } from 'lucide-react';
+import { touchFriendlyButton, disableHoverOnTouch, touchFocus } from '@/utils/touch';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -25,11 +26,11 @@ const ButtonBase = styled.button<ButtonProps>`
   outline: none;
   position: relative;
   overflow: hidden;
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.border.focus};
-    outline-offset: 2px;
-  }
+  
+  /* 터치 친화적 스타일 적용 */
+  ${touchFriendlyButton}
+  ${disableHoverOnTouch}
+  ${touchFocus}
 
   &:disabled {
     cursor: not-allowed;

@@ -144,13 +144,23 @@ export const SPACING = {
   '4XL': '6rem',
 } as const;
 
-// 브레이크포인트
+// 브레이크포인트 (반응형 디자인 최적화)
 export const BREAKPOINTS = {
-  SM: '640px',
-  MD: '768px',
-  LG: '1024px',
-  XL: '1280px',
-  '2XL': '1536px',
+  XS: '480px',   // 작은 모바일
+  SM: '576px',   // 모바일
+  MD: '768px',   // 태블릿
+  LG: '992px',   // 작은 데스크톱
+  XL: '1200px',  // 데스크톱
+  '2XL': '1400px', // 큰 데스크톱
+} as const;
+
+// 디바이스 타입별 브레이크포인트
+export const DEVICE_BREAKPOINTS = {
+  MOBILE: `(max-width: ${BREAKPOINTS.SM})`,
+  TABLET: `(min-width: ${BREAKPOINTS.SM}) and (max-width: ${BREAKPOINTS.LG})`,
+  DESKTOP: `(min-width: ${BREAKPOINTS.LG})`,
+  MOBILE_AND_TABLET: `(max-width: ${BREAKPOINTS.LG})`,
+  TABLET_AND_DESKTOP: `(min-width: ${BREAKPOINTS.SM})`,
 } as const;
 
 // 애니메이션
@@ -208,4 +218,58 @@ export const TRANSITIONS = {
   FAST: '0.15s ease-in-out',
   NORMAL: '0.3s ease-in-out',
   SLOW: '0.5s ease-in-out',
+} as const;
+
+// 반응형 디자인을 위한 미디어 쿼리 헬퍼
+export const MEDIA_QUERIES = {
+  // 최소 너비 기준
+  min: {
+    xs: `(min-width: ${BREAKPOINTS.XS})`,
+    sm: `(min-width: ${BREAKPOINTS.SM})`,
+    md: `(min-width: ${BREAKPOINTS.MD})`,
+    lg: `(min-width: ${BREAKPOINTS.LG})`,
+    xl: `(min-width: ${BREAKPOINTS.XL})`,
+    '2xl': `(min-width: ${BREAKPOINTS['2XL']})`,
+  },
+  // 최대 너비 기준
+  max: {
+    xs: `(max-width: ${BREAKPOINTS.XS})`,
+    sm: `(max-width: ${BREAKPOINTS.SM})`,
+    md: `(max-width: ${BREAKPOINTS.MD})`,
+    lg: `(max-width: ${BREAKPOINTS.LG})`,
+    xl: `(max-width: ${BREAKPOINTS.XL})`,
+    '2xl': `(max-width: ${BREAKPOINTS['2XL']})`,
+  },
+  // 범위 기준
+  between: {
+    xs_sm: `(min-width: ${BREAKPOINTS.XS}) and (max-width: ${BREAKPOINTS.SM})`,
+    sm_md: `(min-width: ${BREAKPOINTS.SM}) and (max-width: ${BREAKPOINTS.MD})`,
+    md_lg: `(min-width: ${BREAKPOINTS.MD}) and (max-width: ${BREAKPOINTS.LG})`,
+    lg_xl: `(min-width: ${BREAKPOINTS.LG}) and (max-width: ${BREAKPOINTS.XL})`,
+    xl_2xl: `(min-width: ${BREAKPOINTS.XL}) and (max-width: ${BREAKPOINTS['2XL']})`,
+  },
+} as const;
+
+// 터치 디바이스 감지
+export const TOUCH_DEVICE = '(hover: none) and (pointer: coarse)';
+
+// 반응형 그리드 시스템
+export const GRID_SYSTEM = {
+  CONTAINER_MAX_WIDTH: '1200px',
+  CONTAINER_PADDING: {
+    MOBILE: '1rem',
+    TABLET: '1.5rem',
+    DESKTOP: '2rem',
+  },
+  GRID_GAP: {
+    MOBILE: '1rem',
+    TABLET: '1.5rem',
+    DESKTOP: '2rem',
+  },
+  COLUMNS: {
+    MOBILE: 1,
+    TABLET: 2,
+    DESKTOP: 3,
+    LARGE_DESKTOP: 4,
+  },
 } as const;

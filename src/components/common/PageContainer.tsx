@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { media, responsiveTypography, responsiveSpacing } from '@/utils/responsive';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -7,29 +8,33 @@ const Container = styled.div`
   padding: 2rem 1.5rem;
   min-height: calc(100vh - 80px); // 헤더 높이만큼 빼기
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.MD}) {
-    padding: 1rem;
-  }
+  ${media.max.md`
+    padding: 1.5rem 1rem;
+  `}
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.SM}) {
-    padding: 0.75rem;
-  }
+  ${media.max.sm`
+    padding: 1rem 0.75rem;
+  `}
 `;
 
 const PageHeader = styled.div`
   margin-bottom: 2rem;
+  
+  ${media.max.sm`
+    margin-bottom: 1.5rem;
+  `}
 `;
 
 const PageTitle = styled.h1`
-  font-size: ${({ theme }) => theme.fonts.size['3XL']};
+  ${responsiveTypography.h1}
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.gray[900]};
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 0.5rem 0;
 `;
 
 const PageDescription = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.LG};
-  color: ${({ theme }) => theme.colors.gray[500]};
+  ${responsiveTypography.body}
+  color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0;
 `;
 

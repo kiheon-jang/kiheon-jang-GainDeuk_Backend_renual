@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { TrendingUp, TrendingDown, Clock, Target, Shield, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
 import type { TradingSignal } from '@/types';
 import { formatPrice, getSignalColor, getSignalText, formatTimeRemaining } from '@/utils';
+import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
 
 interface TradingSignalCardProps {
   signal: TradingSignal;
@@ -31,6 +32,10 @@ const Card = styled.div<{ signalType: 'BUY' | 'SELL' }>`
   overflow: hidden;
   animation: ${fadeIn} 0.3s ease-out;
   transition: ${({ theme }) => theme.transitions.FAST};
+
+  ${media.max.sm`
+    padding: 1rem;
+  `}
 
   &:hover {
     box-shadow: ${({ theme }) => theme.shadows.XL};

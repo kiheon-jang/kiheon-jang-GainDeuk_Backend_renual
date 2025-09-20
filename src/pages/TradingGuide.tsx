@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MainLayout from '@/components/common/MainLayout';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -7,12 +7,19 @@ import TradeExecutionModal from '@/components/modals/TradeExecutionModal';
 import StrategyFilter from '@/components/common/StrategyFilter';
 import RealTimeIndicator from '@/components/common/RealTimeIndicator';
 import { useTradingSignals, useExecuteTrade } from '@/hooks/useApi';
+import { useRealTimeData, useNetworkStatus } from '@/hooks/useRealTimeData';
+import { media, responsiveTypography, responsiveSpacing } from '@/utils/responsive';
+// import { useOptimisticUpdates } from '@/hooks/useOptimisticUpdates';
 import type { TradingSignal } from '@/types';
 
 const TradingContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  
+  ${media.max.sm`
+    gap: 1.5rem;
+  `}
 `;
 
 const HeroSection = styled.div`
@@ -21,16 +28,20 @@ const HeroSection = styled.div`
   padding: 2rem;
   border-radius: ${({ theme }) => theme.borderRadius.LG};
   text-align: center;
+  
+  ${media.max.sm`
+    padding: 1.5rem 1rem;
+  `}
 `;
 
 const HeroTitle = styled.h2`
-  font-size: ${({ theme }) => theme.fonts.size['2XL']};
+  ${responsiveTypography.h2}
   font-weight: 700;
   margin: 0 0 1rem 0;
 `;
 
 const HeroDescription = styled.p`
-  font-size: ${({ theme }) => theme.fonts.size.LG};
+  ${responsiveTypography.body}
   margin: 0;
   opacity: 0.9;
 `;
@@ -41,12 +52,22 @@ const HeaderSection = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
+  
+  ${media.max.sm`
+    flex-direction: column;
+    align-items: stretch;
+  `}
 `;
 
 const SignalsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
+  
+  ${media.max.sm`
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  `}
 `;
 
 const EmptyState = styled.div`
@@ -55,23 +76,32 @@ const EmptyState = styled.div`
   background: ${({ theme }) => theme.colors.background.primary};
   border-radius: ${({ theme }) => theme.borderRadius.LG};
   box-shadow: ${({ theme }) => theme.shadows.MD};
-  border: 2px dashed ${({ theme }) => theme.colors.gray[200]};
+  border: 2px dashed ${({ theme }) => theme.colors.border.primary};
+  
+  ${media.max.sm`
+    padding: 2rem 1rem;
+  `}
 `;
 
 const EmptyStateIcon = styled.div`
   font-size: 4rem;
   margin-bottom: 1rem;
+  
+  ${media.max.sm`
+    font-size: 3rem;
+  `}
 `;
 
 const EmptyStateTitle = styled.h3`
-  font-size: ${({ theme }) => theme.fonts.size.XL};
+  ${responsiveTypography.h3}
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.gray[500]};
+  color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0 0 0.5rem 0;
 `;
 
 const EmptyStateText = styled.p`
-  color: ${({ theme }) => theme.colors.gray[400]};
+  ${responsiveTypography.body}
+  color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
 `;
 
@@ -83,6 +113,10 @@ const ErrorMessage = styled.div`
   text-align: center;
   font-weight: 500;
   border: 1px solid ${({ theme }) => theme.colors.danger}40;
+  
+  ${media.max.sm`
+    padding: 0.75rem;
+  `}
 `;
 
 const StatsSection = styled.div`
@@ -90,6 +124,12 @@ const StatsSection = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
+  
+  ${media.max.sm`
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  `}
 `;
 
 const StatCard = styled.div`
@@ -97,20 +137,24 @@ const StatCard = styled.div`
   padding: 1rem;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   box-shadow: ${({ theme }) => theme.shadows.SM};
-  border: 1px solid ${({ theme }) => theme.colors.gray[100]};
+  border: 1px solid ${({ theme }) => theme.colors.border.primary};
   text-align: center;
+  
+  ${media.max.sm`
+    padding: 0.75rem;
+  `}
 `;
 
 const StatValue = styled.div`
-  font-size: ${({ theme }) => theme.fonts.size['2XL']};
+  ${responsiveTypography.h2}
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.gray[900]};
+  color: ${({ theme }) => theme.colors.text.primary};
   margin-bottom: 0.25rem;
 `;
 
 const StatLabel = styled.div`
-  font-size: ${({ theme }) => theme.fonts.size.SM};
-  color: ${({ theme }) => theme.colors.gray[500]};
+  ${responsiveTypography.small}
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-weight: 500;
 `;
 
@@ -118,9 +162,40 @@ const TradingGuide: React.FC = () => {
   const [selectedStrategy, setSelectedStrategy] = useState('all');
   const [selectedSignal, setSelectedSignal] = useState<TradingSignal | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
 
   const { data: signals, isLoading, error, isFetching } = useTradingSignals();
   const executeTradeMutation = useExecuteTrade();
+  
+  // 실시간 데이터 및 네트워크 상태 훅
+  const { startTradingSignalsUpdates, stopRealTimeUpdates } = useRealTimeData();
+  const { isOnline, connectionType } = useNetworkStatus();
+  // const { optimisticTradeExecution } = useOptimisticUpdates();
+
+  // 실시간 업데이트 시작
+  useEffect(() => {
+    if (isOnline) {
+      startTradingSignalsUpdates(
+        'user123',
+        selectedStrategy === 'all' ? undefined : selectedStrategy,
+        (newSignal) => {
+          console.log('New trading signal received:', newSignal);
+          setLastUpdateTime(new Date());
+        }
+      );
+    }
+
+    return () => {
+      stopRealTimeUpdates();
+    };
+  }, [selectedStrategy, isOnline, startTradingSignalsUpdates, stopRealTimeUpdates]);
+
+  // 데이터 업데이트 시 시간 갱신
+  useEffect(() => {
+    if (signals && !isLoading) {
+      setLastUpdateTime(new Date());
+    }
+  }, [signals, isLoading]);
 
   // 필터링된 신호들
   const filteredSignals = signals?.filter(signal => 
@@ -201,8 +276,10 @@ const TradingGuide: React.FC = () => {
             onStrategyChange={setSelectedStrategy}
           />
           <RealTimeIndicator
-            isConnected={!isFetching}
-            lastUpdate={new Date().toLocaleTimeString('ko-KR')}
+            isOnline={isOnline}
+            isRefreshing={isFetching}
+            lastUpdateTime={lastUpdateTime}
+            connectionType={connectionType}
           />
         </HeaderSection>
 

@@ -3,7 +3,9 @@ import styled from 'styled-components';
 import { Toaster } from 'react-hot-toast';
 import Header from './Header';
 import PageContainer from './PageContainer';
+import MobileNavigation from './MobileNavigation';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import { media, responsiveSpacing } from '@/utils/responsive';
 
 const LayoutContainer = styled.div`
   min-height: 100vh;
@@ -13,6 +15,11 @@ const LayoutContainer = styled.div`
 
 const MainContent = styled.main`
   flex: 1;
+  padding-bottom: 60px; // 모바일 네비게이션을 위한 여백
+  
+  ${media.min.lg`
+    padding-bottom: 0; // 데스크톱에서는 여백 제거
+  `}
 `;
 
 const ThemeToggleContainer = styled.div`
@@ -20,6 +27,11 @@ const ThemeToggleContainer = styled.div`
   top: 1rem;
   right: 1rem;
   z-index: 1000;
+  
+  ${media.max.sm`
+    top: 0.75rem;
+    right: 0.75rem;
+  `}
 `;
 
 interface MainLayoutProps {
@@ -28,6 +40,8 @@ interface MainLayoutProps {
   description?: string;
   showHeader?: boolean;
   showPageHeader?: boolean;
+  currentPath?: string;
+  onNavigate?: (path: string) => void;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ 
@@ -35,7 +49,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   title, 
   description, 
   showHeader = true,
-  showPageHeader = true 
+  showPageHeader = true,
+  currentPath,
+  onNavigate
 }) => {
   return (
     <LayoutContainer>
@@ -49,6 +65,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           {children}
         </PageContainer>
       </MainContent>
+      
+      {/* 모바일 네비게이션 */}
+      <MobileNavigation 
+        currentPath={currentPath}
+        onNavigate={onNavigate}
+      />
       
       {/* 테마 토글 버튼 */}
       <ThemeToggleContainer>

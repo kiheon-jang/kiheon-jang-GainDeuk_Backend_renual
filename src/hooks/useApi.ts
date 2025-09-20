@@ -11,8 +11,12 @@ export const useDashboardData = (userId?: string) => {
   return useQuery({
     queryKey: QUERY_KEYS.DASHBOARD_DATA(userId),
     queryFn: () => api.getDashboardData(userId),
-    refetchInterval: 60000, // 1분마다 새로고침
-    staleTime: 30000, // 30초간 캐시 유지
+    refetchInterval: 30000, // 30초마다 새로고침
+    staleTime: 15000, // 15초간 캐시 유지
+    refetchOnWindowFocus: true, // 창 포커스 시 즉시 새로고침
+    refetchOnReconnect: true, // 네트워크 재연결 시 새로고침
+    retry: 2, // 실패 시 2번 재시도
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
 };
 
@@ -23,6 +27,10 @@ export const useRecommendations = (userId?: string) => {
     queryFn: () => api.getRecommendations(userId),
     refetchInterval: 30000, // 30초마다 새로고침
     staleTime: 10000, // 10초간 캐시 유지
+    refetchOnWindowFocus: true, // 창 포커스 시 즉시 새로고침
+    refetchOnReconnect: true, // 네트워크 재연결 시 새로고침
+    retry: 2, // 실패 시 2번 재시도
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
 };
 
@@ -34,6 +42,15 @@ export const useTradingSignals = (userId?: string, strategy?: string) => {
     refetchInterval: 10000, // 10초마다 새로고침 (매매는 빠른 판단이 중요!)
     staleTime: 5000, // 5초간 캐시 유지
     refetchOnWindowFocus: true, // 창 포커스 시 즉시 새로고침
+    refetchOnReconnect: true, // 네트워크 재연결 시 새로고침
+    retry: (failureCount, _error) => {
+      // 네트워크 오류가 아닌 경우에만 재시도
+      if (failureCount < 3) {
+        return true;
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 };
 
@@ -44,6 +61,10 @@ export const useCoins = (searchQuery?: string, sortBy?: string, sortOrder?: 'asc
     queryFn: () => api.getCoins(searchQuery, sortBy, sortOrder, filterBy),
     refetchInterval: 60000, // 1분마다 새로고침
     staleTime: 30000, // 30초간 캐시 유지
+    refetchOnWindowFocus: false, // 코인 목록은 창 포커스 시 새로고침 비활성화 (너무 자주 업데이트됨)
+    refetchOnReconnect: true, // 네트워크 재연결 시 새로고침
+    retry: 2, // 실패 시 2번 재시도
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
   });
 };
 

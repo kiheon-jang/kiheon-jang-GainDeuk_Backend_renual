@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { CoinRecommendation } from '@/types';
 import { getRiskColor, getRiskIcon, formatPrice, formatPercentage } from '@/utils';
+import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
 
 interface CoinRecommendationCardProps {
   recommendation: CoinRecommendation;
@@ -32,6 +33,10 @@ const Card = styled.div<{ isExpanded?: boolean }>`
   border: 2px solid ${({ theme }) => theme.colors.border.primary};
   position: relative;
   overflow: hidden;
+
+  ${media.max.sm`
+    padding: 1rem;
+  `}
 
   &::before {
     content: '';
@@ -70,6 +75,11 @@ const CoinHeader = styled.div`
   align-items: center;
   gap: 1rem;
   margin-bottom: 1rem;
+  
+  ${media.max.sm`
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  `}
 `;
 
 const CoinImage = styled.img`
@@ -77,6 +87,11 @@ const CoinImage = styled.img`
   height: 3rem;
   border-radius: 50%;
   object-fit: cover;
+  
+  ${media.max.sm`
+    width: 2.5rem;
+    height: 2.5rem;
+  `}
 `;
 
 const CoinInfo = styled.div`
@@ -84,22 +99,22 @@ const CoinInfo = styled.div`
 `;
 
 const CoinName = styled.h3`
-  font-size: ${({ theme }) => theme.fonts.size.LG};
+  ${responsiveTypography.h3}
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.gray[900]};
+  color: ${({ theme }) => theme.colors.text.primary};
   margin: 0 0 0.25rem 0;
 `;
 
 const CoinSymbol = styled.span`
-  font-size: ${({ theme }) => theme.fonts.size.SM};
-  color: ${({ theme }) => theme.colors.gray[500]};
+  ${responsiveTypography.small}
+  color: ${({ theme }) => theme.colors.text.secondary};
   font-weight: 500;
 `;
 
 const CoinPrice = styled.div`
-  font-size: ${({ theme }) => theme.fonts.size.BASE};
+  ${responsiveTypography.body}
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.gray[900]};
+  color: ${({ theme }) => theme.colors.text.primary};
   margin-top: 0.25rem;
 `;
 

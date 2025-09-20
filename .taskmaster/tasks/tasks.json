@@ -1,0 +1,218 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Project Setup and Configuration",
+        "description": "Initialize the React project with TypeScript, Vite, and configure essential dependencies",
+        "details": "1. Create a new Vite project with React and TypeScript template\n2. Install required dependencies:\n   - styled-components for styling\n   - react-query for state management\n   - react-router-dom for routing\n   - lucide-react for icons\n   - react-hot-toast for notifications\n   - axios for HTTP requests\n3. Set up project structure with folders for components, pages, hooks, utils, and types\n4. Configure TypeScript settings\n5. Set up ESLint and Prettier for code quality\n6. Create basic theme configuration for styled-components\n7. Set up environment variables for API endpoints",
+        "testStrategy": "Verify project builds successfully without errors. Run linting checks to ensure code quality standards are met. Test that all dependencies are correctly installed and accessible.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "API Client Implementation",
+        "description": "Create a centralized API client using Axios to handle all backend communications",
+        "details": "1. Create an API client using Axios\n2. Configure base URL to http://localhost:3000\n3. Implement request/response interceptors for error handling\n4. Create typed API functions for each endpoint:\n   - getDashboardData()\n   - getRecommendations()\n   - getTradingSignals()\n   - executeTrade(tradeData)\n   - analyzeUserProfile(profileData)\n   - getCoins()\n5. Implement error handling and response parsing\n6. Add request timeout and retry logic\n7. Create TypeScript interfaces for all API responses",
+        "testStrategy": "Write unit tests for API client functions using mock responses. Test error handling by simulating network failures and server errors. Verify that response types match the expected interfaces.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Routing and Layout Structure",
+        "description": "Set up React Router with all required routes and create the main layout components",
+        "details": "1. Configure React Router with the following routes:\n   - / (Dashboard)\n   - /trading-guide (Real-time Trading Guide)\n   - /profile-analysis (User Profile Analysis)\n   - /coins (Coin List)\n   - /settings (Settings)\n2. Create layout components:\n   - MainLayout (includes header, navigation, and footer)\n   - PageContainer (for consistent page margins)\n3. Implement responsive navigation menu\n4. Create loading and error state components\n5. Implement protected routes if authentication is required\n6. Add navigation guards and redirects",
+        "testStrategy": "Test navigation between routes. Verify that layouts render correctly on different screen sizes. Check that route parameters are correctly passed and processed.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Dashboard Page Implementation",
+        "description": "Create the main dashboard page showing AI recommended coins and user profile summary",
+        "details": "1. Create Dashboard page component\n2. Implement React Query hook to fetch dashboard data\n3. Design and implement AI recommendation cards showing:\n   - Coin name and symbol\n   - 3-line explanation for recommendation\n   - Expected return percentage\n   - Risk level (1-5) with color coding\n4. Create user profile summary section\n5. Add loading and error states\n6. Implement auto-refresh functionality (every 30 seconds)\n7. Add animations for data updates",
+        "testStrategy": "Test dashboard data fetching and rendering. Verify that recommendation cards display all required information correctly. Test auto-refresh functionality and loading states. Ensure responsive design works on different screen sizes.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Trading Signal Card Component",
+        "description": "Develop the core TradingSignalCard component for displaying real-time buy/sell signals",
+        "details": "1. Create TradingSignalCard component with the following features:\n   - Clear 'Buy Now/Sell Now' signal indicator\n   - Automatically calculated stop-loss, target price, and position size\n   - Strategy type indicator (Scalping/Swing/Day Trading)\n   - Step-by-step trading checklist\n   - Signal rationale section (news, technical analysis, whale activity, sentiment)\n   - Countdown timer for signal validity\n   - Execute trade button\n2. Implement styled-components for different states (buy/sell)\n3. Add animations for real-time updates\n4. Create hover states and interactive elements",
+        "testStrategy": "Test rendering of all signal card elements. Verify that different signal types (buy/sell) display correctly with appropriate styling. Test countdown timer functionality. Ensure responsive design works on different screen sizes.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Real-time Trading Guide Page",
+        "description": "Implement the real-time trading guide page with live signals and trading execution",
+        "details": "1. Create TradingGuidePage component\n2. Implement React Query hook to fetch trading signals with 10-second refresh interval\n3. Display TradingSignalCard components for each signal\n4. Add filters for different trading strategies\n5. Implement trade execution functionality:\n   - Create trade execution modal\n   - Add confirmation steps\n   - Handle API calls to /api/trading/execute\n   - Show success/error notifications\n6. Add historical signals section\n7. Implement real-time updates with visual indicators",
+        "testStrategy": "Test real-time data fetching and rendering. Verify that signals update correctly every 10 seconds. Test trade execution flow including API calls and error handling. Ensure responsive design works on different screen sizes.",
+        "priority": "high",
+        "dependencies": [
+          2,
+          3,
+          5
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "User Profile Analysis Page",
+        "description": "Create the user profile analysis page with investment style test and personalized recommendations",
+        "details": "1. Create ProfileAnalysisPage component\n2. Implement multi-step investment style questionnaire (5-10 questions)\n3. Create form validation and progress tracking\n4. Implement API call to /api/analyze-profile\n5. Design and implement results display:\n   - Investment style description\n   - Personalized recommendations\n   - Suggested investment strategies\n6. Add ability to retake the test\n7. Implement saving results to user profile\n8. Add visual representations of analysis results",
+        "testStrategy": "Test form validation and submission. Verify that all questionnaire steps work correctly. Test API integration for profile analysis. Ensure results are displayed correctly and saved to user profile.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Coin List Page Implementation",
+        "description": "Develop the coin list page showing all available coins with search and filtering",
+        "details": "1. Create CoinsPage component\n2. Implement React Query hook to fetch coin data\n3. Create CoinCard component for displaying coin information\n4. Implement search functionality\n5. Add filtering options (by market cap, price, etc.)\n6. Create modal for detailed coin information\n7. Highlight AI-recommended coins\n8. Implement pagination or infinite scrolling\n9. Add sorting options",
+        "testStrategy": "Test coin data fetching and rendering. Verify search and filtering functionality. Test modal for detailed information. Ensure responsive design works on different screen sizes.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "AI Recommendation Card Component",
+        "description": "Create a reusable component for displaying AI coin recommendations with explanations",
+        "details": "1. Create RecommendationCard component with:\n   - Coin name, symbol, and icon\n   - 3-line explanation for recommendation\n   - Expected return percentage\n   - Risk level indicator (1-5) with color coding\n   - Action buttons (view details, add to watchlist)\n2. Implement styled-components for different risk levels\n3. Add hover states and animations\n4. Create expanded view for additional details\n5. Add share functionality",
+        "testStrategy": "Test rendering of all card elements. Verify that different risk levels display correctly with appropriate styling. Test interactive elements and expanded view. Ensure responsive design works on different screen sizes.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Settings Page Implementation",
+        "description": "Create the settings page for notification, language, and theme preferences",
+        "details": "1. Create SettingsPage component\n2. Implement the following settings sections:\n   - Notification preferences (trading signals, price alerts, etc.)\n   - Language settings (Korean/English)\n   - Theme settings (light/dark mode)\n3. Create form components for each setting type\n4. Implement local storage for settings persistence\n5. Add reset to defaults option\n6. Create visual feedback for saved settings",
+        "testStrategy": "Test settings form submission and validation. Verify that settings are correctly saved to local storage. Test theme switching functionality. Ensure responsive design works on different screen sizes.",
+        "priority": "low",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Notification System Implementation",
+        "description": "Implement a comprehensive notification system using React Hot Toast",
+        "details": "1. Create a notification service using React Hot Toast\n2. Implement different notification types:\n   - Success notifications\n   - Error notifications\n   - Trading signal alerts\n   - Price alerts\n3. Create custom styled notification components\n4. Add sound alerts for important notifications\n5. Implement notification queue management\n6. Add ability to dismiss notifications\n7. Create notification history view",
+        "testStrategy": "Test different notification types and styling. Verify that notifications appear and disappear correctly. Test sound alerts functionality. Ensure notifications are responsive on different screen sizes.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Theme System and Styled Components Setup",
+        "description": "Implement a comprehensive theme system with styled-components for consistent styling",
+        "details": "1. Create theme configuration with:\n   - Color palette (primary, secondary, accent, success, warning, error)\n   - Typography settings (font families, sizes, weights)\n   - Spacing system\n   - Breakpoints for responsive design\n   - Animation durations and easing functions\n2. Implement ThemeProvider with light/dark mode support\n3. Create global styles\n4. Develop reusable styled components:\n   - Buttons (primary, secondary, text)\n   - Input fields\n   - Cards\n   - Modals\n   - Badges\n5. Add theme switching functionality",
+        "testStrategy": "Test theme switching between light and dark modes. Verify that all components render correctly with theme values. Test responsive breakpoints. Ensure accessibility standards are met for color contrast.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Real-time Data Updates with React Query",
+        "description": "Implement real-time data fetching and caching strategy using React Query",
+        "details": "1. Configure React Query client with optimal settings\n2. Implement custom hooks for each data type:\n   - useDashboardData()\n   - useRecommendations()\n   - useTradingSignals()\n   - useCoins()\n   - useUserProfile()\n3. Set up appropriate refetch intervals:\n   - Trading signals: 10 seconds\n   - Dashboard data: 30 seconds\n   - Coin data: 60 seconds\n4. Implement optimistic updates for user actions\n5. Add error handling and retry logic\n6. Implement cache invalidation strategy\n7. Add background refetching indicators",
+        "testStrategy": "Test data fetching and caching behavior. Verify that refetch intervals work correctly. Test error handling and retry logic. Ensure optimistic updates work as expected.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Responsive Design Implementation",
+        "description": "Ensure the application is fully responsive across all device sizes",
+        "details": "1. Implement responsive design system using styled-components\n2. Create breakpoints for different device sizes:\n   - Mobile: < 576px\n   - Tablet: 576px - 992px\n   - Desktop: > 992px\n3. Implement responsive layouts for all pages\n4. Create mobile-specific navigation (bottom tab bar)\n5. Optimize card layouts for different screen sizes\n6. Implement touch-friendly interactions for mobile\n7. Test and fix any responsive issues",
+        "testStrategy": "Test application on various device sizes and orientations. Verify that all components adapt correctly to different screen sizes. Test touch interactions on mobile devices. Ensure no horizontal scrolling occurs on any screen size.",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          4,
+          6,
+          8,
+          10
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Performance Optimization",
+        "description": "Optimize application performance for smooth user experience",
+        "details": "1. Implement code splitting with React.lazy and Suspense\n2. Add memoization for expensive calculations\n3. Optimize React Query caching strategy\n4. Implement virtualization for long lists\n5. Optimize images and assets\n6. Add preloading for critical resources\n7. Implement service worker for offline support\n8. Add performance monitoring\n9. Optimize bundle size with tree shaking\n10. Implement debouncing for search inputs",
+        "testStrategy": "Measure and compare performance metrics before and after optimization. Test application load time, time to interactive, and runtime performance. Verify that code splitting works correctly. Test application behavior under poor network conditions.",
+        "priority": "medium",
+        "dependencies": [
+          4,
+          6,
+          8,
+          13,
+          14
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-09-20T07:52:01.915Z",
+      "updated": "2025-09-20T08:18:04.536Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

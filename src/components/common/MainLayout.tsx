@@ -3,14 +3,23 @@ import styled from 'styled-components';
 import { Toaster } from 'react-hot-toast';
 import Header from './Header';
 import PageContainer from './PageContainer';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const LayoutContainer = styled.div`
   min-height: 100vh;
   background: ${({ theme }) => theme.colors.background.secondary};
+  transition: ${({ theme }) => theme.transitions.NORMAL};
 `;
 
 const MainContent = styled.main`
   flex: 1;
+`;
+
+const ThemeToggleContainer = styled.div`
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
 `;
 
 interface MainLayoutProps {
@@ -40,6 +49,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           {children}
         </PageContainer>
       </MainContent>
+      
+      {/* 테마 토글 버튼 */}
+      <ThemeToggleContainer>
+        <ThemeToggle />
+      </ThemeToggleContainer>
       
       {/* 토스트 알림 설정 */}
       <Toaster

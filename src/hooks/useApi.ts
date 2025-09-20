@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { toast } from 'react-hot-toast';
+import { notify } from '@/services/notificationService';
 import { api } from '@/services/api';
 import { QUERY_KEYS, invalidateQueries } from '@/services/queryClient';
 import type { 
@@ -37,6 +37,16 @@ export const useTradingSignals = (userId?: string, strategy?: string) => {
   });
 };
 
+// 코인 목록 훅
+export const useCoins = (searchQuery?: string, sortBy?: string, sortOrder?: 'asc' | 'desc', filterBy?: string) => {
+  return useQuery({
+    queryKey: QUERY_KEYS.COINS_DATA(searchQuery, sortBy, sortOrder, filterBy),
+    queryFn: () => api.getCoins(searchQuery, sortBy, sortOrder, filterBy),
+    refetchInterval: 60000, // 1분마다 새로고침
+    staleTime: 30000, // 30초간 캐시 유지
+  });
+};
+
 // 매매 신호 상세 정보 훅
 export const useTradingSignalDetail = (signalId: string) => {
   return useQuery({
@@ -57,11 +67,11 @@ export const useExecuteTrade = () => {
       invalidateQueries.dashboard();
       invalidateQueries.recommendations();
       
-      toast.success('매매가 성공적으로 실행되었습니다!');
+      notify.success('매매 실행 완료', '매매가 성공적으로 실행되었습니다!');
       console.log('Trade executed successfully:', data);
     },
     onError: (error) => {
-      toast.error('매매 실행 중 오류가 발생했습니다.');
+      notify.error('매매 실행 오류', '매매 실행 중 오류가 발생했습니다.');
       console.error('Trade execution error:', error);
     },
   });
@@ -77,25 +87,16 @@ export const useAnalyzeUserProfile = () => {
       invalidateQueries.recommendations();
       invalidateQueries.tradingSignals();
       
-      toast.success('투자 성향 분석이 완료되었습니다!');
+      notify.success('분석 완료', '투자 성향 분석이 완료되었습니다!');
       console.log('User profile analyzed successfully:', data);
     },
     onError: (error) => {
-      toast.error('성향 분석 중 오류가 발생했습니다.');
+      notify.error('분석 오류', '성향 분석 중 오류가 발생했습니다.');
       console.error('User profile analysis error:', error);
     },
   });
 };
 
-// 코인 목록 훅
-export const useCoins = (search?: string, limit?: number) => {
-  return useQuery({
-    queryKey: QUERY_KEYS.COINS_DATA(search, limit),
-    queryFn: () => api.getCoins(search, limit),
-    refetchInterval: 60000, // 1분마다 새로고침
-    staleTime: 30000, // 30초간 캐시 유지
-  });
-};
 
 // 코인 상세 정보 훅
 export const useCoinDetails = (coinId: string) => {
@@ -127,11 +128,11 @@ export const useSaveUserProfile = () => {
       invalidateQueries.recommendations();
       invalidateQueries.tradingSignals();
       
-      toast.success('프로필이 저장되었습니다!');
+      notify.success('프로필 저장 완료', '프로필이 저장되었습니다!');
       console.log('User profile saved successfully:', data);
     },
     onError: (error) => {
-      toast.error('프로필 저장 중 오류가 발생했습니다.');
+      notify.error('프로필 저장 오류', '프로필 저장 중 오류가 발생했습니다.');
       console.error('User profile save error:', error);
     },
   });

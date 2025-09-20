@@ -15,11 +15,11 @@ const FilterContainer = styled.div`
 
 const FilterButton = styled.button<{ isActive: boolean }>`
   padding: 0.5rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.SM};
   font-weight: 500;
   cursor: pointer;
-  transition: ${({ theme }) => theme.transitions.fast};
+  transition: ${({ theme }) => theme.transitions.FAST};
   border: 1px solid ${({ isActive, theme }) => isActive ? theme.colors.primary : theme.colors.gray[200]};
   background: ${({ isActive, theme }) => isActive ? theme.colors.primary : theme.colors.background.primary};
   color: ${({ isActive, theme }) => isActive ? 'white' : theme.colors.gray[700]};

@@ -1,9 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { queryClient } from '@/services/queryClient';
-import { theme } from '@/constants/theme';
 
 // Pages
 import Dashboard from '@/pages/Dashboard';
@@ -18,7 +17,7 @@ import './index.css';
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider>
         <Router>
           <Routes>
             {/* 메인 대시보드 */}

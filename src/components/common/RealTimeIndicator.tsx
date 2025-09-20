@@ -15,7 +15,7 @@ const IndicatorContainer = styled.div<{ isConnected: boolean }>`
   padding: 0.5rem 1rem;
   background: ${({ isConnected, theme }) => isConnected ? `${theme.colors.secondary}15` : `${theme.colors.danger}15`};
   border: 1px solid ${({ isConnected, theme }) => isConnected ? `${theme.colors.secondary}40` : `${theme.colors.danger}40`};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.SM};
   font-weight: 500;
   color: ${({ isConnected, theme }) => isConnected ? theme.colors.secondary : theme.colors.danger};

@@ -19,7 +19,7 @@ const HeroSection = styled.div`
   background: linear-gradient(135deg, ${({ theme }) => theme.colors.danger}, ${({ theme }) => theme.colors.warning});
   color: white;
   padding: 2rem;
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  border-radius: ${({ theme }) => theme.borderRadius.LG};
   text-align: center;
 `;
 
@@ -53,8 +53,8 @@ const EmptyState = styled.div`
   text-align: center;
   padding: 3rem 1rem;
   background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.shadows.md};
+  border-radius: ${({ theme }) => theme.borderRadius.LG};
+  box-shadow: ${({ theme }) => theme.shadows.MD};
   border: 2px dashed ${({ theme }) => theme.colors.gray[200]};
 `;
 
@@ -79,7 +79,7 @@ const ErrorMessage = styled.div`
   background: ${({ theme }) => theme.colors.danger}15;
   color: ${({ theme }) => theme.colors.danger};
   padding: 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   text-align: center;
   font-weight: 500;
   border: 1px solid ${({ theme }) => theme.colors.danger}40;
@@ -95,8 +95,8 @@ const StatsSection = styled.div`
 const StatCard = styled.div`
   background: ${({ theme }) => theme.colors.background.primary};
   padding: 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  box-shadow: ${({ theme }) => theme.shadows.sm};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
+  box-shadow: ${({ theme }) => theme.shadows.SM};
   border: 1px solid ${({ theme }) => theme.colors.gray[100]};
   text-align: center;
 `;

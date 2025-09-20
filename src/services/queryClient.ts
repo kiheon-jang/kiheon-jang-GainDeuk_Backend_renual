@@ -38,8 +38,8 @@ export const QUERY_KEYS = {
   
   // 코인 관련
   COINS: ['coins'] as const,
-  COINS_DATA: (search?: string, limit?: number) => 
-    [...QUERY_KEYS.COINS, search, limit] as const,
+  COINS_DATA: (searchQuery?: string, sortBy?: string, sortOrder?: 'asc' | 'desc', filterBy?: string) => 
+    [...QUERY_KEYS.COINS, 'data', searchQuery, sortBy, sortOrder, filterBy] as const,
   COIN_DETAIL: (coinId: string) => [...QUERY_KEYS.COINS, 'detail', coinId] as const,
   
   // 사용자 프로필 관련
@@ -83,9 +83,9 @@ export const invalidateQueries = {
   },
   
   // 코인 관련 쿼리 무효화
-  coins: (search?: string, limit?: number) => {
-    if (search || limit) {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.COINS_DATA(search, limit) });
+  coins: (searchQuery?: string, sortBy?: string, sortOrder?: 'asc' | 'desc', filterBy?: string) => {
+    if (searchQuery || sortBy || sortOrder || filterBy) {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.COINS_DATA(searchQuery, sortBy, sortOrder, filterBy) });
     } else {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.COINS });
     }

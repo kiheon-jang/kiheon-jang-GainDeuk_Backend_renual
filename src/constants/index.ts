@@ -18,22 +18,44 @@ export const COLORS = {
   SECONDARY: '#10B981',    // 초록색 - 수익
   DANGER: '#EF4444',       // 빨간색 - 손실
   WARNING: '#F59E0B',      // 주황색 - 주의
+  SUCCESS: '#10B981',      // 성공
+  INFO: '#3B82F6',         // 정보
+  ACCENT: '#8B5CF6',       // 강조색
   
-  // 중성 색상
+  // 중성 색상 (라이트 모드)
   GRAY_50: '#F9FAFB',
   GRAY_100: '#F3F4F6',
   GRAY_200: '#E5E7EB',
+  GRAY_300: '#D1D5DB',
   GRAY_400: '#9CA3AF',
   GRAY_500: '#6B7280',
   GRAY_600: '#4B5563',
   GRAY_700: '#374151',
-  GRAY_300: '#D1D5DB',
+  GRAY_800: '#1F2937',
   GRAY_900: '#111827',
   
-  // 배경
+  // 다크모드 색상
+  DARK_GRAY_50: '#18181B',
+  DARK_GRAY_100: '#27272A',
+  DARK_GRAY_200: '#3F3F46',
+  DARK_GRAY_300: '#52525B',
+  DARK_GRAY_400: '#71717A',
+  DARK_GRAY_500: '#A1A1AA',
+  DARK_GRAY_600: '#D4D4D8',
+  DARK_GRAY_700: '#E4E4E7',
+  DARK_GRAY_800: '#F4F4F5',
+  DARK_GRAY_900: '#FAFAFA',
+  
+  // 배경 (라이트 모드)
   BG_PRIMARY: '#FFFFFF',
   BG_SECONDARY: '#F9FAFB',
+  BG_TERTIARY: '#F3F4F6',
   BG_DARK: '#1F2937',
+  
+  // 배경 (다크 모드)
+  DARK_BG_PRIMARY: '#0A0A0B',
+  DARK_BG_SECONDARY: '#18181B',
+  DARK_BG_TERTIARY: '#27272A',
 } as const;
 
 // 위험도별 색상
@@ -118,6 +140,8 @@ export const SPACING = {
   LG: '1.5rem',
   XL: '2rem',
   '2XL': '3rem',
+  '3XL': '4rem',
+  '4XL': '6rem',
 } as const;
 
 // 브레이크포인트
@@ -127,4 +151,61 @@ export const BREAKPOINTS = {
   LG: '1024px',
   XL: '1280px',
   '2XL': '1536px',
+} as const;
+
+// 애니메이션
+export const ANIMATIONS = {
+  DURATION: {
+    FAST: '150ms',
+    NORMAL: '300ms',
+    SLOW: '500ms',
+  },
+  EASING: {
+    EASE_IN: 'cubic-bezier(0.4, 0, 1, 1)',
+    EASE_OUT: 'cubic-bezier(0, 0, 0.2, 1)',
+    EASE_IN_OUT: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    BOUNCE: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+  },
+} as const;
+
+// 그림자
+export const SHADOWS = {
+  SM: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  MD: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  LG: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+  XL: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+  '2XL': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+  INNER: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+} as const;
+
+// 다크모드 그림자
+export const DARK_SHADOWS = {
+  SM: '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+  MD: '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
+  LG: '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+  XL: '0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+  '2XL': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+  INNER: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.3)',
+} as const;
+
+// 테마 모드
+export const THEME_MODES = {
+  LIGHT: 'light',
+  DARK: 'dark',
+} as const;
+
+// 테두리 반지름
+export const BORDER_RADIUS = {
+  SM: '0.25rem',
+  MD: '0.5rem',
+  LG: '0.75rem',
+  XL: '1rem',
+  FULL: '9999px',
+} as const;
+
+// 전환 효과
+export const TRANSITIONS = {
+  FAST: '0.15s ease-in-out',
+  NORMAL: '0.3s ease-in-out',
+  SLOW: '0.5s ease-in-out',
 } as const;

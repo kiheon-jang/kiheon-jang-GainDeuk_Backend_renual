@@ -23,17 +23,17 @@ const fadeIn = keyframes`
 
 const Card = styled.div<{ signalType: 'BUY' | 'SELL' }>`
   background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.shadows.lg};
+  border-radius: ${({ theme }) => theme.borderRadius.LG};
+  box-shadow: ${({ theme }) => theme.shadows.LG};
   padding: 1.5rem;
   border: 2px solid ${({ signalType }) => getSignalColor(signalType)}40;
   position: relative;
   overflow: hidden;
   animation: ${fadeIn} 0.3s ease-out;
-  transition: ${({ theme }) => theme.transitions.fast};
+  transition: ${({ theme }) => theme.transitions.FAST};
 
   &:hover {
-    box-shadow: ${({ theme }) => theme.shadows.xl};
+    box-shadow: ${({ theme }) => theme.shadows.XL};
     transform: translateY(-2px);
   }
 
@@ -92,7 +92,7 @@ const SignalBadge = styled.div<{ signalType: 'BUY' | 'SELL' }>`
   background: ${({ signalType }) => getSignalColor(signalType)}15;
   color: ${({ signalType }) => getSignalColor(signalType)};
   padding: 0.75rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-weight: 700;
   font-size: ${({ theme }) => theme.fonts.size.SM};
   animation: ${pulse} 2s infinite;
@@ -121,7 +121,7 @@ const InfoItem = styled.div`
   gap: 0.75rem;
   padding: 0.75rem;
   background: ${({ theme }) => theme.colors.gray[50]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
 `;
 
 const InfoIcon = styled.div<{ color?: string }>`
@@ -165,7 +165,7 @@ const StrategyBadge = styled.div`
   background: ${({ theme }) => theme.colors.primary}15;
   color: ${({ theme }) => theme.colors.primary};
   padding: 0.5rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-weight: 600;
   font-size: ${({ theme }) => theme.fonts.size.SM};
   width: fit-content;
@@ -175,7 +175,7 @@ const ConfidenceBar = styled.div`
   width: 100%;
   height: 0.5rem;
   background: ${({ theme }) => theme.colors.gray[200]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   overflow: hidden;
 `;
 
@@ -212,7 +212,7 @@ const RationaleItem = styled.div`
   gap: 0.75rem;
   padding: 0.75rem;
   background: ${({ theme }) => theme.colors.gray[50]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.SM};
   color: ${({ theme }) => theme.colors.gray[700]};
   line-height: 1.5;
@@ -244,7 +244,7 @@ const ChecklistItem = styled.div<{ completed?: boolean }>`
   gap: 0.75rem;
   padding: 0.75rem;
   background: ${({ completed, theme }) => completed ? `${theme.colors.secondary}15` : theme.colors.gray[50]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.SM};
   color: ${({ completed, theme }) => completed ? theme.colors.secondary : theme.colors.gray[700]};
   text-decoration: ${({ completed }) => completed ? 'line-through' : 'none'};
@@ -263,11 +263,11 @@ const ExecuteButton = styled.button<{ signalType: 'BUY' | 'SELL'; disabled?: boo
   color: white;
   border: none;
   padding: 1rem 1.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.BASE};
   font-weight: 700;
   cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
-  transition: ${({ theme }) => theme.transitions.fast};
+  transition: ${({ theme }) => theme.transitions.FAST};
   display: flex;
   align-items: center;
   justify-content: center;

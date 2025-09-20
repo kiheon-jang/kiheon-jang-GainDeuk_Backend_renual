@@ -28,8 +28,8 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 
 const ModalContent = styled.div`
   background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.shadows.xl};
+  border-radius: ${({ theme }) => theme.borderRadius.LG};
+  box-shadow: ${({ theme }) => theme.shadows.XL};
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -61,8 +61,8 @@ const CloseButton = styled.button`
   color: ${({ theme }) => theme.colors.gray[500]};
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  transition: ${({ theme }) => theme.transitions.fast};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
+  transition: ${({ theme }) => theme.transitions.FAST};
 
   &:hover {
     background: ${({ theme }) => theme.colors.gray[100]};
@@ -77,7 +77,7 @@ const ModalBody = styled.div`
 const SignalSummary = styled.div<{ signalType: 'BUY' | 'SELL' | 'HOLD' }>`
   background: ${({ signalType, theme }) => signalType === 'HOLD' ? theme.colors.gray[50] : `${getSignalColor(signalType)}15`};
   border: 1px solid ${({ signalType, theme }) => signalType === 'HOLD' ? theme.colors.gray[200] : `${getSignalColor(signalType)}40`};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   padding: 1rem;
   margin-bottom: 1.5rem;
 `;
@@ -119,7 +119,7 @@ const SignalBadge = styled.div<{ signalType: 'BUY' | 'SELL' | 'HOLD' }>`
   background: ${({ signalType }) => signalType === 'HOLD' ? '#F59E0B15' : `${getSignalColor(signalType)}15`};
   color: ${({ signalType }) => signalType === 'HOLD' ? '#F59E0B' : getSignalColor(signalType)};
   padding: 0.5rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-weight: 600;
   font-size: ${({ theme }) => theme.fonts.size.SM};
 `;
@@ -134,7 +134,7 @@ const TradeDetails = styled.div`
 const DetailItem = styled.div`
   background: ${({ theme }) => theme.colors.gray[50]};
   padding: 0.75rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
 `;
 
 const DetailLabel = styled.div`
@@ -153,7 +153,7 @@ const DetailValue = styled.div`
 const WarningSection = styled.div`
   background: ${({ theme }) => theme.colors.warning}15;
   border: 1px solid ${({ theme }) => theme.colors.warning}40;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   padding: 1rem;
   margin-bottom: 1.5rem;
 `;
@@ -181,11 +181,11 @@ const ActionButtons = styled.div`
 const Button = styled.button<{ variant: 'primary' | 'secondary'; signalType?: 'BUY' | 'SELL' | 'HOLD'; disabled?: boolean }>`
   flex: 1;
   padding: 1rem 1.5rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.BASE};
   font-weight: 600;
   cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
-  transition: ${({ theme }) => theme.transitions.fast};
+  transition: ${({ theme }) => theme.transitions.FAST};
   display: flex;
   align-items: center;
   justify-content: center;

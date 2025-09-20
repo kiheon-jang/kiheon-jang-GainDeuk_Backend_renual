@@ -10,8 +10,8 @@ interface MarketSummaryProps {
 
 const MarketCard = styled.div`
   background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.shadows.md};
+  border-radius: ${({ theme }) => theme.borderRadius.LG};
+  box-shadow: ${({ theme }) => theme.shadows.MD};
   padding: 1.5rem;
   border: 1px solid ${({ theme }) => theme.colors.gray[100]};
 `;
@@ -68,7 +68,7 @@ const TrendIndicator = styled.div<{ trend: 'up' | 'down' | 'sideways' }>`
     }
   }};
   padding: 0.5rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   width: fit-content;
   margin-bottom: 1rem;
 `;
@@ -79,7 +79,7 @@ const TrendDescription = styled.div`
   line-height: 1.5;
   background: ${({ theme }) => theme.colors.gray[50]};
   padding: 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
 `;
 
 const getTrendIcon = (trend: 'up' | 'down' | 'sideways') => {

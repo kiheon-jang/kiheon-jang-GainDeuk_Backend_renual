@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { notify } from '@/services/notificationService';
 import MainLayout from '@/components/common/MainLayout';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import CoinRecommendationCard from '@/components/cards/CoinRecommendationCard';
 import UserProfileSummary from '@/components/cards/UserProfileSummary';
 import MarketSummary from '@/components/cards/MarketSummary';
 import { useDashboardData } from '@/hooks/useApi';
+import type { CoinRecommendation } from '@/types';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -17,7 +19,7 @@ const WelcomeSection = styled.div`
   background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary}, ${({ theme }) => theme.colors.secondary});
   color: white;
   padding: 2rem;
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  border-radius: ${({ theme }) => theme.borderRadius.LG};
   text-align: center;
 `;
 
@@ -60,13 +62,54 @@ const ErrorMessage = styled.div`
   background: ${({ theme }) => theme.colors.danger}15;
   color: ${({ theme }) => theme.colors.danger};
   padding: 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   text-align: center;
   font-weight: 500;
 `;
 
 const Dashboard: React.FC = () => {
   const { data: dashboardData, isLoading, error } = useDashboardData();
+  const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
+
+  const handleAddToWatchlist = (coinId: string) => {
+    setWatchlist(prev => {
+      const newWatchlist = new Set(prev);
+      if (newWatchlist.has(coinId)) {
+        newWatchlist.delete(coinId);
+        notify.success('관심목록 업데이트', '관심목록에서 제거되었습니다.');
+      } else {
+        newWatchlist.add(coinId);
+        notify.success('관심목록 업데이트', '관심목록에 추가되었습니다.');
+      }
+      return newWatchlist;
+    });
+  };
+
+  const handleShare = (recommendation: CoinRecommendation) => {
+    const shareText = `AI가 추천하는 코인: ${recommendation.coin.name} (${recommendation.coin.symbol})\n예상 수익률: ${recommendation.expectedReturn}%\n위험도: ${recommendation.riskLevel}/5\n\nGainDeuk에서 확인해보세요!`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'AI 코인 추천',
+        text: shareText,
+        url: window.location.href,
+      }).catch(() => {
+        // 공유 실패 시 클립보드에 복사
+        navigator.clipboard.writeText(shareText);
+        notify.success('공유 완료', '추천 정보가 클립보드에 복사되었습니다.');
+      });
+    } else {
+      // Web Share API를 지원하지 않는 경우 클립보드에 복사
+      navigator.clipboard.writeText(shareText);
+      notify.success('공유 완료', '추천 정보가 클립보드에 복사되었습니다.');
+    }
+  };
+
+  const handleCoinClick = (recommendation: CoinRecommendation) => {
+    // TODO: 코인 상세 페이지로 이동 또는 모달 표시
+    console.log('Coin clicked:', recommendation.coin.id);
+    notify.info('코인 상세보기', `${recommendation.coin.name} 상세 정보를 확인합니다.`);
+  };
 
   if (isLoading) {
     return (
@@ -114,10 +157,10 @@ const Dashboard: React.FC = () => {
                 <CoinRecommendationCard
                   key={`${recommendation.coin.id}-${index}`}
                   recommendation={recommendation}
-                  onClick={() => {
-                    // TODO: 코인 상세 페이지로 이동
-                    console.log('Coin clicked:', recommendation.coin.id);
-                  }}
+                  onClick={() => handleCoinClick(recommendation)}
+                  onAddToWatchlist={handleAddToWatchlist}
+                  onShare={handleShare}
+                  isInWatchlist={watchlist.has(recommendation.coin.id)}
                 />
               ))}
             </RecommendationsGrid>

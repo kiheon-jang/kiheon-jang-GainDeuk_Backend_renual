@@ -15,7 +15,7 @@ const HeaderContainer = styled.header`
   padding: 1rem 1.5rem;
   background: ${({ theme }) => theme.colors.background.primary};
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray[100]};
-  box-shadow: ${({ theme }) => theme.shadows.sm};
+  box-shadow: ${({ theme }) => theme.shadows.SM};
   position: sticky;
   top: 0;
   z-index: 100;
@@ -35,7 +35,7 @@ const LogoIcon = styled.div`
   width: 2rem;
   height: 2rem;
   background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary}, ${({ theme }) => theme.colors.secondary});
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,12 +58,12 @@ const NavItem = styled.a<{ active?: boolean }>`
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   color: ${({ theme, active }) => active ? theme.colors.primary : theme.colors.gray[500]};
   background: ${({ theme, active }) => active ? theme.colors.gray[50] : 'transparent'};
   text-decoration: none;
   font-weight: 500;
-  transition: ${({ theme }) => theme.transitions.fast};
+  transition: ${({ theme }) => theme.transitions.FAST};
   cursor: pointer;
 
   &:hover {
@@ -81,9 +81,9 @@ const MobileMenuButton = styled.button`
   border: none;
   background: transparent;
   color: ${({ theme }) => theme.colors.gray[500]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   cursor: pointer;
-  transition: ${({ theme }) => theme.transitions.fast};
+  transition: ${({ theme }) => theme.transitions.FAST};
 
   &:hover {
     background: ${({ theme }) => theme.colors.gray[100]};

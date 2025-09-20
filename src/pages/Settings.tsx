@@ -1,6 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import MainLayout from '@/components/common/MainLayout';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import NotificationSettingsComponent from '@/components/settings/NotificationSettings';
+import LanguageSettingsComponent from '@/components/settings/LanguageSettings';
+import ThemeSettingsComponent from '@/components/settings/ThemeSettings';
+import AppSettingsComponent from '@/components/settings/AppSettings';
+import SettingsManagement from '@/components/settings/SettingsManagement';
+import NotificationSettings from '@/components/notifications/NotificationSettings';
+import NotificationHistory from '@/components/notifications/NotificationHistory';
+import { useSettings } from '@/hooks/useSettings';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const SettingsContainer = styled.div`
   display: flex;
@@ -8,67 +18,89 @@ const SettingsContainer = styled.div`
   gap: 2rem;
 `;
 
-const SettingsCard = styled.div`
-  background: ${({ theme }) => theme.colors.background.primary};
-  padding: 2rem;
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.shadows.md};
-  border: 2px dashed ${({ theme }) => theme.colors.gray[200]};
-`;
-
-const SettingsTitle = styled.h3`
-  font-size: ${({ theme }) => theme.fonts.size.XL};
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.gray[500]};
-  margin: 0 0 1rem 0;
-`;
-
-const SettingsText = styled.p`
-  color: ${({ theme }) => theme.colors.gray[400]};
-  margin: 0;
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
 `;
 
 const Settings: React.FC = () => {
+  const {
+    settings,
+    isLoading,
+    updateNotificationSettings,
+    updateLanguageSettings,
+    updateThemeSettings,
+    updateAppSettings,
+    resetSettings,
+    exportSettings,
+    importSettings,
+  } = useSettings();
+
+  const {
+    settings: notificationSettings,
+    history: notificationHistory,
+    updateSettings: updateNotificationSettingsHook,
+    testNotification,
+    clearHistory,
+  } = useNotifications();
+
+  if (isLoading) {
+    return (
+      <MainLayout 
+        title="⚙️ 설정" 
+        description="알림, 언어, 테마 등 앱 설정을 관리하세요"
+      >
+        <LoadingContainer>
+          <LoadingSpinner size="lg" text="설정을 불러오는 중..." />
+        </LoadingContainer>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout 
       title="⚙️ 설정" 
       description="알림, 언어, 테마 등 앱 설정을 관리하세요"
     >
       <SettingsContainer>
-        <SettingsCard>
-          <SettingsTitle>🔔 알림 설정</SettingsTitle>
-          <SettingsText>
-            매매 신호, 가격 변동, 뉴스 등 다양한 알림을 설정할 수 있습니다.
-          </SettingsText>
-        </SettingsCard>
+        <NotificationSettingsComponent
+          settings={settings.notifications}
+          onUpdate={updateNotificationSettings}
+        />
 
-        <SettingsCard>
-          <SettingsTitle>🌐 언어 설정</SettingsTitle>
-          <SettingsText>
-            한국어, 영어 등 다양한 언어를 선택할 수 있습니다.
-          </SettingsText>
-        </SettingsCard>
+        <NotificationSettings
+          settings={notificationSettings}
+          onUpdate={updateNotificationSettingsHook}
+          onTestNotification={testNotification}
+        />
 
-        <SettingsCard>
-          <SettingsTitle>🎨 테마 설정</SettingsTitle>
-          <SettingsText>
-            라이트 모드, 다크 모드 등 테마를 변경할 수 있습니다.
-          </SettingsText>
-        </SettingsCard>
+        <NotificationHistory
+          notifications={notificationHistory.notifications}
+          onClearHistory={clearHistory}
+        />
 
-        <SettingsCard>
-          <SettingsTitle>🔒 개인정보 보호</SettingsTitle>
-          <SettingsText>
-            개인정보 처리방침, 데이터 삭제 등 개인정보 관련 설정입니다.
-          </SettingsText>
-        </SettingsCard>
+        <LanguageSettingsComponent
+          settings={settings.language}
+          onUpdate={updateLanguageSettings}
+        />
 
-        <SettingsCard>
-          <SettingsTitle>📱 앱 정보</SettingsTitle>
-          <SettingsText>
-            버전 정보, 업데이트 내역, 개발자 정보 등을 확인할 수 있습니다.
-          </SettingsText>
-        </SettingsCard>
+        <ThemeSettingsComponent
+          settings={settings.theme}
+          onUpdate={updateThemeSettings}
+        />
+
+        <AppSettingsComponent
+          settings={settings.app}
+          onUpdate={updateAppSettings}
+        />
+
+        <SettingsManagement
+          onReset={resetSettings}
+          onExport={exportSettings}
+          onImport={importSettings}
+        />
       </SettingsContainer>
     </MainLayout>
   );

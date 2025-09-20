@@ -162,18 +162,6 @@ class ApiClient {
     }
   }
 
-  // 코인 목록 조회
-  async getCoins(search?: string, limit?: number): Promise<Coin[]> {
-    try {
-      const response = await this.client.get<ApiResponse<Coin[]>>('/coins', {
-        params: { search, limit }
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to fetch coins:', error);
-      throw error;
-    }
-  }
 
   // 코인 상세 정보 조회
   async getCoinDetails(coinId: string): Promise<Coin> {
@@ -219,6 +207,28 @@ class ApiClient {
     }
   }
 
+  // 코인 목록 조회
+  async getCoins(
+    searchQuery?: string, 
+    sortBy?: string, 
+    sortOrder?: 'asc' | 'desc', 
+    filterBy?: string
+  ): Promise<Coin[]> {
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('search', searchQuery);
+      if (sortBy) params.append('sortBy', sortBy);
+      if (sortOrder) params.append('sortOrder', sortOrder);
+      if (filterBy) params.append('filter', filterBy);
+      
+      const response = await this.client.get<ApiResponse<Coin[]>>(`/coins?${params.toString()}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch coins:', error);
+      throw error;
+    }
+  }
+
   // 서버 상태 확인
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
     try {
@@ -243,7 +253,8 @@ export const api = {
   executeTrade: (tradeData: { signalId: string; action: 'BUY' | 'SELL'; amount: number; price: number }) => 
     apiClient.executeTrade(tradeData),
   analyzeUserProfile: (testAnswers: any[]) => apiClient.analyzeUserProfile(testAnswers),
-  getCoins: (search?: string, limit?: number) => apiClient.getCoins(search, limit),
+  getCoins: (searchQuery?: string, sortBy?: string, sortOrder?: 'asc' | 'desc', filterBy?: string) => 
+    apiClient.getCoins(searchQuery, sortBy, sortOrder, filterBy),
   getCoinDetails: (coinId: string) => apiClient.getCoinDetails(coinId),
   getInvestmentTest: () => apiClient.getInvestmentTest(),
   saveUserProfile: (profile: UserProfile) => apiClient.saveUserProfile(profile),

@@ -9,8 +9,8 @@ interface UserProfileSummaryProps {
 
 const ProfileCard = styled.div`
   background: ${({ theme }) => theme.colors.background.primary};
-  border-radius: ${({ theme }) => theme.borderRadius.lg};
-  box-shadow: ${({ theme }) => theme.shadows.md};
+  border-radius: ${({ theme }) => theme.borderRadius.LG};
+  box-shadow: ${({ theme }) => theme.shadows.MD};
   padding: 1.5rem;
   border: 1px solid ${({ theme }) => theme.colors.gray[100]};
 `;
@@ -37,11 +37,11 @@ const EditButton = styled.button`
   color: white;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.SM};
   font-weight: 500;
   cursor: pointer;
-  transition: ${({ theme }) => theme.transitions.fast};
+  transition: ${({ theme }) => theme.transitions.FAST};
 
   &:hover {
     background: ${({ theme }) => theme.colors.primary}dd;
@@ -72,7 +72,7 @@ const ProfileValue = styled.span<{ type?: 'style' | 'level' | 'strategy' }>`
   color: ${({ theme }) => theme.colors.gray[900]};
   font-weight: 600;
   padding: 0.25rem 0.75rem;
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
   background: ${({ type, theme }) => {
     switch (type) {
       case 'style':
@@ -106,7 +106,7 @@ const StrategyDescription = styled.div`
   margin-top: 0.5rem;
   padding: 1rem;
   background: ${({ theme }) => theme.colors.gray[50]};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
+  border-radius: ${({ theme }) => theme.borderRadius.MD};
 `;
 
 const getInvestmentStyleText = (style: string) => {

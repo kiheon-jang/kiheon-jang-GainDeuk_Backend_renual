@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MainLayout from '@/components/common/MainLayout';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import TradingSignalCard from '@/components/cards/TradingSignalCard';
+import CompactTradingSignalCard from '@/components/cards/CompactTradingSignalCard';
 import TradeExecutionModal from '@/components/modals/TradeExecutionModal';
 import StrategyFilter from '@/components/common/StrategyFilter';
 import RealTimeIndicator from '@/components/common/RealTimeIndicator';
 import { useTradingSignals, useExecuteTrade } from '@/hooks/useApi';
 import { useRealTimeData, useNetworkStatus } from '@/hooks/useRealTimeData';
-import { media, responsiveTypography, responsiveSpacing } from '@/utils/responsive';
+import { media } from '@/utils/responsive';
 // import { useOptimisticUpdates } from '@/hooks/useOptimisticUpdates';
-import type { ApiTradingSignal } from '@/types';
+import type { ApiTradingSignal, TradingSignal } from '@/types';
 
 const TradingContainer = styled.div`
   display: flex;
@@ -35,15 +35,33 @@ const HeroSection = styled.div`
 `;
 
 const HeroTitle = styled.h2`
-  ${responsiveTypography.h2}
+  font-size: 2rem;
+  line-height: 1.2;
   font-weight: 700;
   margin: 0 0 1rem 0;
+
+  @media (min-width: 640px) {
+    font-size: 2.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 3rem;
+  }
 `;
 
 const HeroDescription = styled.p`
-  ${responsiveTypography.body}
+  font-size: 1rem;
+  line-height: 1.5;
   margin: 0;
   opacity: 0.9;
+
+  @media (min-width: 640px) {
+    font-size: 1.125rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 1.25rem;
+  }
 `;
 
 const HeaderSection = styled.div`
@@ -59,14 +77,13 @@ const HeaderSection = styled.div`
   `}
 `;
 
-const SignalsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
+const SignalsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   
   ${media.max.sm`
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.5rem;
   `}
 `;
 
@@ -93,16 +110,34 @@ const EmptyStateIcon = styled.div`
 `;
 
 const EmptyStateTitle = styled.h3`
-  ${responsiveTypography.h3}
+  font-size: 1.5rem;
+  line-height: 1.3;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text.secondary};
   margin: 0 0 0.5rem 0;
+
+  @media (min-width: 640px) {
+    font-size: 1.875rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 2.25rem;
+  }
 `;
 
 const EmptyStateText = styled.p`
-  ${responsiveTypography.body}
+  font-size: 1rem;
+  line-height: 1.5;
   color: ${({ theme }) => theme.colors.text.tertiary};
   margin: 0;
+
+  @media (min-width: 640px) {
+    font-size: 1.125rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 1.25rem;
+  }
 `;
 
 const ErrorMessage = styled.div`
@@ -146,16 +181,34 @@ const StatCard = styled.div`
 `;
 
 const StatValue = styled.div`
-  ${responsiveTypography.h2}
+  font-size: 1.5rem;
+  line-height: 1.2;
   font-weight: 700;
   color: ${({ theme }) => theme.colors.text.primary};
   margin-bottom: 0.25rem;
+
+  @media (min-width: 640px) {
+    font-size: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const StatLabel = styled.div`
-  ${responsiveTypography.small}
+  font-size: 0.75rem;
+  line-height: 1.4;
   color: ${({ theme }) => theme.colors.text.secondary};
   font-weight: 500;
+
+  @media (min-width: 640px) {
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 1rem;
+  }
 `;
 
 const TradingGuide: React.FC = () => {
@@ -220,10 +273,58 @@ const TradingGuide: React.FC = () => {
     );
   };
 
+  const convertApiSignalToTradingSignal = (apiSignal: ApiTradingSignal): TradingSignal => {
+    return {
+      id: apiSignal.id,
+      coin: {
+        id: apiSignal.coinId,
+        symbol: apiSignal.symbol,
+        name: apiSignal.name,
+        currentPrice: apiSignal.price,
+        change24h: 0, // API에서 제공하지 않음
+        image: '', // API에서 제공하지 않음
+      },
+      signal: {
+        action: apiSignal.action,
+        strength: apiSignal.confidence === 'HIGH' ? 'STRONG' : apiSignal.confidence === 'MEDIUM' ? 'MEDIUM' : 'WEAK',
+        confidence: apiSignal.score,
+      },
+      targets: {
+        entryPrice: apiSignal.price,
+        targetPrice: apiSignal.price * 1.1, // 임시값
+        stopLoss: apiSignal.price * 0.95, // 임시값
+        takeProfit: apiSignal.price * 1.2, // 임시값
+        positionSize: 100000, // 임시값
+        positionSizePercentage: 10, // 임시값
+        maxRiskAmount: 5000, // 임시값
+      },
+      timeframe: {
+        strategy: 'DAY_TRADING', // 임시값
+        duration: apiSignal.timeframe,
+        validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24시간 후
+      },
+      reasons: {
+        technical: [`점수: ${apiSignal.score}/100`],
+        fundamental: [`우선순위: ${apiSignal.priority}`],
+        sentiment: [],
+        news: [],
+      },
+      checklist: [
+        { id: '1', text: '시장 상황 확인', completed: false },
+        { id: '2', text: '리스크 관리', completed: false },
+        { id: '3', text: '포지션 크기 결정', completed: false },
+      ],
+      riskLevel: 3,
+      expectedReturn: 10,
+      maxLoss: 5,
+    };
+  };
+
   const handleSignalClick = (signalId: string, _action: 'BUY' | 'SELL', _amount: number, _price: number) => {
-    const signal = signals?.find(s => s.id === signalId);
-    if (signal) {
-      setSelectedSignal(signal);
+    const apiSignal = signals?.find(s => s.id === signalId);
+    if (apiSignal) {
+      const tradingSignal = convertApiSignalToTradingSignal(apiSignal);
+      setSelectedSignal(tradingSignal);
       setIsModalOpen(true);
     }
   };
@@ -314,16 +415,16 @@ const TradingGuide: React.FC = () => {
             </EmptyStateText>
           </EmptyState>
         ) : (
-          <SignalsGrid>
+          <SignalsList>
             {filteredSignals.map((signal) => (
-              <TradingSignalCard
+              <CompactTradingSignalCard
                 key={signal.id}
                 signal={signal}
                 onExecuteTrade={handleSignalClick}
                 isExecuting={executeTradeMutation.isPending}
               />
             ))}
-          </SignalsGrid>
+          </SignalsList>
         )}
 
         <TradeExecutionModal

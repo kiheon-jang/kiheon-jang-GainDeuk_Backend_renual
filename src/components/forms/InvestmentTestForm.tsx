@@ -246,7 +246,7 @@ const InvestmentTestForm: React.FC<InvestmentTestFormProps> = ({
         <OptionsList>
           {currentQ.options.map((option, index) => (
             <OptionButton
-              key={index}
+              key={`option-${currentQ.id}-${index}`}
               $isSelected={answers[currentQ.id] === index}
               onClick={() => handleOptionSelect(index)}
             >

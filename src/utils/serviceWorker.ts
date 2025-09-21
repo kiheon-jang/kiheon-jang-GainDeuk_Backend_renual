@@ -11,6 +11,9 @@ interface ServiceWorkerRegistration {
  * Service Worker 등록
  */
 export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration> => {
+  // TEMPORARILY DISABLED FOR DEBUGGING
+  return { registration: null, error: null };
+  
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');

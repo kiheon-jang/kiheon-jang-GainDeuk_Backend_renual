@@ -71,7 +71,12 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
-    cors: true
+    cors: true,
+    host: 'localhost',
+    hmr: {
+      port: 5173,
+      host: 'localhost'
+    }
   },
   // 빌드 설정
   build: {

@@ -430,7 +430,7 @@ const CachingSettings: React.FC = () => {
           
           <TipsList>
             {[...tips, ...optimizationTips].map((tip, index) => (
-              <TipItem key={index}>
+              <TipItem key={`tip-${index}-${tip.slice(0, 10)}`}>
                 <TipIcon>
                   <AlertTriangle size={16} />
                 </TipIcon>

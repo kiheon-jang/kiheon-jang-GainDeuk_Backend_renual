@@ -459,7 +459,7 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
             `우선순위: ${signal.priority}`,
             `시간대: ${signal.timeframe}`
           ].map((reason, index) => (
-            <RationaleItem key={index}>
+            <RationaleItem key={`rationale-${index}-${reason.slice(0, 10)}`}>
               💡 {reason}
             </RationaleItem>
           ))}

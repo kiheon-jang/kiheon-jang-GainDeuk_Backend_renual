@@ -201,9 +201,9 @@ const CoinList: React.FC = () => {
           </EmptyState>
         ) : (
           <CoinGrid>
-            {filteredCoins.map((coin) => (
+            {filteredCoins.map((coin, index) => (
               <CoinCard
-                key={coin.id}
+                key={coin.id || `coin-${index}`}
                 coin={coin}
                 isRecommended={recommendedCoinIds.includes(coin.id)}
                 onClick={() => handleCoinClick(coin)}

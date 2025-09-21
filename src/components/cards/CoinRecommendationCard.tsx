@@ -411,7 +411,7 @@ const CoinRecommendationCard: React.FC<CoinRecommendationCardProps> = ({
       
       <ReasonsList>
         {mainReasons.map((reason, index) => (
-          <ReasonItem key={index}>
+          <ReasonItem key={`reason-${index}-${reason.slice(0, 10)}`}>
             💡 {reason}
           </ReasonItem>
         ))}
@@ -461,7 +461,7 @@ const CoinRecommendationCard: React.FC<CoinRecommendationCardProps> = ({
               추가 분석 내용:
             </h4>
             {additionalReasons.map((reason, index) => (
-              <AdditionalReasonItem key={index}>
+              <AdditionalReasonItem key={`additional-${index}-${reason.slice(0, 10)}`}>
                 <AlertTriangle size={14} />
                 {reason}
               </AdditionalReasonItem>

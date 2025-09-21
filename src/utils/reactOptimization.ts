@@ -4,7 +4,7 @@
  */
 
 import React, { memo, useMemo, useCallback, useRef, useEffect, useState } from 'react';
-import { storage } from './storage';
+import { storage } from './index';
 
 // React.memo 비교 함수 타입
 export type MemoComparisonFunction<T> = (prevProps: T, nextProps: T) => boolean;

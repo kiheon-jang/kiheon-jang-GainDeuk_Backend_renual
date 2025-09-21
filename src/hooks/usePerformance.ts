@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { mark, measure, measureApiRequest, measureUserInteraction } from '@/utils/performance';
-import { storage } from '@/utils/storage';
+import { storage } from '@/utils';
 
 interface PerformanceMetrics {
   renderTime: number;

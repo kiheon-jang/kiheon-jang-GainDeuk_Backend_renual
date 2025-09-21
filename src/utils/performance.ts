@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { storage } from './storage';
+import { storage } from './index';
 
 // 성능 마크 타입 정의
 export type PerformanceMark = 

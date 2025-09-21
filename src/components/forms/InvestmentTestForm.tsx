@@ -26,10 +26,10 @@ const ProgressBar = styled.div`
   margin-bottom: 2rem;
 `;
 
-const ProgressFill = styled.div<{ progress: number }>`
+const ProgressFill = styled.div<{ $progress: number }>`
   height: 100%;
   background: linear-gradient(90deg, ${({ theme }) => theme.colors.primary}, ${({ theme }) => theme.colors.secondary});
-  width: ${({ progress }) => progress}%;
+  width: ${({ $progress }) => $progress}%;
   transition: width 0.3s ease;
 `;
 
@@ -58,13 +58,13 @@ const OptionsList = styled.div`
   gap: 1rem;
 `;
 
-const OptionButton = styled.button<{ isSelected: boolean }>`
+const OptionButton = styled.button<{ $isSelected: boolean }>`
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: ${({ isSelected, theme }) => isSelected ? `${theme.colors.primary}15` : theme.colors.gray[50]};
-  border: 2px solid ${({ isSelected, theme }) => isSelected ? theme.colors.primary : theme.colors.gray[200]};
+  background: ${({ $isSelected, theme }) => $isSelected ? `${theme.colors.primary}15` : theme.colors.gray[50]};
+  border: 2px solid ${({ $isSelected, theme }) => $isSelected ? theme.colors.primary : theme.colors.gray[200]};
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   cursor: pointer;
   transition: ${({ theme }) => theme.transitions.FAST};
@@ -72,23 +72,23 @@ const OptionButton = styled.button<{ isSelected: boolean }>`
   width: 100%;
 
   &:hover {
-    background: ${({ isSelected, theme }) => isSelected ? `${theme.colors.primary}20` : theme.colors.gray[100]};
-    border-color: ${({ isSelected, theme }) => isSelected ? theme.colors.primary : theme.colors.gray[300]};
+    background: ${({ $isSelected, theme }) => $isSelected ? `${theme.colors.primary}20` : theme.colors.gray[100]};
+    border-color: ${({ $isSelected, theme }) => $isSelected ? theme.colors.primary : theme.colors.gray[300]};
   }
 `;
 
-const OptionRadio = styled.div<{ isSelected: boolean }>`
+const OptionRadio = styled.div<{ $isSelected: boolean }>`
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
-  border: 2px solid ${({ isSelected, theme }) => isSelected ? theme.colors.primary : theme.colors.gray[400]};
-  background: ${({ isSelected, theme }) => isSelected ? theme.colors.primary : 'transparent'};
+  border: 2px solid ${({ $isSelected, theme }) => $isSelected ? theme.colors.primary : theme.colors.gray[400]};
+  background: ${({ $isSelected, theme }) => $isSelected ? theme.colors.primary : 'transparent'};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
-  ${({ isSelected }) => isSelected && `
+  ${({ $isSelected }) => $isSelected && `
     &::after {
       content: '';
       width: 0.5rem;
@@ -113,7 +113,7 @@ const NavigationButtons = styled.div`
   margin-top: 2rem;
 `;
 
-const NavButton = styled.button<{ variant: 'primary' | 'secondary'; disabled?: boolean }>`
+const NavButton = styled.button<{ $variant: 'primary' | 'secondary'; disabled?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -125,8 +125,8 @@ const NavButton = styled.button<{ variant: 'primary' | 'secondary'; disabled?: b
   transition: ${({ theme }) => theme.transitions.FAST};
   border: none;
 
-  ${({ variant, disabled, theme }) => {
-    if (variant === 'primary') {
+  ${({ $variant, disabled, theme }) => {
+    if ($variant === 'primary') {
       return `
         background: ${disabled ? '#9CA3AF' : theme.colors.primary};
         color: white;
@@ -223,7 +223,7 @@ const InvestmentTestForm: React.FC<InvestmentTestFormProps> = ({
             투자 성향 분석이 완료되었습니다.<br/>
             AI가 당신에게 맞는 투자 전략을 추천해드리겠습니다.
           </CompletionText>
-          <NavButton variant="primary" onClick={handleRetake}>
+          <NavButton $variant="primary" onClick={handleRetake}>
             다시 테스트하기
           </NavButton>
         </CompletionMessage>
@@ -234,7 +234,7 @@ const InvestmentTestForm: React.FC<InvestmentTestFormProps> = ({
   return (
     <TestContainer>
       <ProgressBar>
-        <ProgressFill progress={progress} />
+        <ProgressFill $progress={progress} />
       </ProgressBar>
 
       <QuestionContainer>
@@ -247,10 +247,10 @@ const InvestmentTestForm: React.FC<InvestmentTestFormProps> = ({
           {currentQ.options.map((option, index) => (
             <OptionButton
               key={index}
-              isSelected={answers[currentQ.id] === index}
+              $isSelected={answers[currentQ.id] === index}
               onClick={() => handleOptionSelect(index)}
             >
-              <OptionRadio isSelected={answers[currentQ.id] === index} />
+              <OptionRadio $isSelected={answers[currentQ.id] === index} />
               <OptionText>{option.text}</OptionText>
             </OptionButton>
           ))}
@@ -259,7 +259,7 @@ const InvestmentTestForm: React.FC<InvestmentTestFormProps> = ({
 
       <NavigationButtons>
         <NavButton
-          variant="secondary"
+          $variant="secondary"
           onClick={handlePrevious}
           disabled={currentQuestion === 0}
         >
@@ -268,7 +268,7 @@ const InvestmentTestForm: React.FC<InvestmentTestFormProps> = ({
         </NavButton>
 
         <NavButton
-          variant="primary"
+          $variant="primary"
           onClick={handleNext}
           disabled={!canProceed}
         >

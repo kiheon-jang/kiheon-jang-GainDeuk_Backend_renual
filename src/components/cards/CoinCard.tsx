@@ -191,4 +191,4 @@ const CoinCard: React.FC<CoinCardProps> = ({ coin, isRecommended = false, onClic
   );
 };
 
-export default CoinCard;
+export default React.memo(CoinCard);

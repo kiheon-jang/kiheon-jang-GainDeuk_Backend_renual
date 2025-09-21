@@ -63,11 +63,11 @@ const CompactHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  min-height: 60px;
+  min-height: 70px;
 
   ${media.max.sm`
     padding: 0.75rem 1rem;
-    min-height: 50px;
+    min-height: 60px;
   `}
 `;
 
@@ -76,6 +76,7 @@ const CoinInfo = styled.div`
   align-items: center;
   gap: 0.75rem;
   flex: 1;
+  min-width: 0;
 `;
 
 const CoinIconContainer = styled.div<{ $color: string }>`
@@ -130,11 +131,52 @@ const CoinSymbol = styled.span`
   font-weight: 500;
 `;
 
+const MiddleInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 80px;
+  flex-shrink: 0;
+
+  ${media.max.sm`
+    min-width: 60px;
+  `}
+`;
+
+const Timeframe = styled.div`
+  font-size: 0.75rem;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-weight: 500;
+  text-align: center;
+
+  ${media.max.sm`
+    font-size: 0.625rem;
+  `}
+`;
+
+const ExpectedReturn = styled.div`
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #10B981;
+  text-align: center;
+
+  ${media.max.sm`
+    font-size: 0.75rem;
+  `}
+`;
+
 const SignalInfo = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  min-width: 80px;
   flex-shrink: 0;
+
+  ${media.max.sm`
+    min-width: 60px;
+  `}
 `;
 
 const SignalBadge = styled.div<{ $signalType: 'BUY' | 'SELL' | 'HOLD' }>`
@@ -173,6 +215,12 @@ const PriceInfo = styled.div`
   flex-direction: column;
   align-items: flex-end;
   gap: 0.25rem;
+  min-width: 80px;
+  flex-shrink: 0;
+
+  ${media.max.sm`
+    min-width: 60px;
+  `}
 `;
 
 const Price = styled.div`
@@ -487,6 +535,11 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
           </CoinDetails>
         </CoinInfo>
         
+        <MiddleInfo>
+          <Timeframe>{signal.timeframe}</Timeframe>
+          <ExpectedReturn>+15%</ExpectedReturn>
+        </MiddleInfo>
+
         <SignalInfo>
           <SignalBadge $signalType={signal.action}>
             <SignalIcon $signalType={signal.action}>

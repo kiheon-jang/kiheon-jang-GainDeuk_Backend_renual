@@ -4,6 +4,7 @@
  */
 
 import React, { memo, useMemo, useCallback, useRef, useEffect, useState } from 'react';
+import { storage } from './storage';
 
 // React.memo 비교 함수 타입
 export type MemoComparisonFunction<T> = (prevProps: T, nextProps: T) => boolean;
@@ -22,6 +23,18 @@ export interface PerformanceMetrics {
   averageRenderTime: number;
   totalRenderTime: number;
 }
+
+/**
+ * 성능 모니터링이 활성화되어 있는지 확인
+ */
+const isPerformanceMonitoringEnabled = (): boolean => {
+  try {
+    const settings = storage.get('user-settings');
+    return settings?.app?.performanceMonitoring ?? true; // 기본값은 true
+  } catch {
+    return true; // 오류 시 기본값은 true
+  }
+};
 
 // 성능 측정 훅
 export const usePerformanceMetrics = (componentName: string) => {
@@ -61,9 +74,9 @@ export const usePerformanceMetrics = (componentName: string) => {
     };
   }, [renderCountRef.current]);
 
-  // 개발 모드에서만 로깅
+  // 개발 모드에서만 로깅 (성능 모니터링이 활성화된 경우에만)
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development' && renderCountRef.current > 1) {
+    if (process.env.NODE_ENV === 'development' && isPerformanceMonitoringEnabled() && renderCountRef.current > 1) {
       console.log(`[${componentName}] Render #${renderCountRef.current}:`, {
         lastRenderTime: `${metrics.lastRenderTime.toFixed(2)}ms`,
         averageRenderTime: `${metrics.averageRenderTime.toFixed(2)}ms`,

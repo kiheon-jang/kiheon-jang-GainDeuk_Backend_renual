@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import { storage } from './storage';
 
 // 성능 마크 타입 정의
 export type PerformanceMark = 
@@ -76,6 +77,18 @@ let performanceData: PerformanceMetrics = {
 };
 
 /**
+ * 성능 모니터링이 활성화되어 있는지 확인
+ */
+const isPerformanceMonitoringEnabled = (): boolean => {
+  try {
+    const settings = storage.get('user-settings');
+    return settings?.app?.performanceMonitoring ?? true; // 기본값은 true
+  } catch {
+    return true; // 오류 시 기본값은 true
+  }
+};
+
+/**
  * 성능 마크 생성
  */
 export const mark = (name: PerformanceMark, detail?: string): void => {
@@ -83,8 +96,8 @@ export const mark = (name: PerformanceMark, detail?: string): void => {
     const markName = detail ? `${name}-${detail}` : name;
     window.performance.mark(markName);
     
-    // 개발 환경에서 콘솔에 로그
-    if (process.env.NODE_ENV === 'development') {
+    // 개발 환경에서 콘솔에 로그 (성능 모니터링이 활성화된 경우에만)
+    if (process.env.NODE_ENV === 'development' && isPerformanceMonitoringEnabled()) {
       console.log(`📊 Performance Mark: ${markName}`);
     }
   }
@@ -109,8 +122,8 @@ export const measure = (
       const measure = window.performance.getEntriesByName(measureName)[0];
       const duration = measure ? measure.duration : 0;
       
-      // 개발 환경에서 콘솔에 로그
-      if (process.env.NODE_ENV === 'development') {
+      // 개발 환경에서 콘솔에 로그 (성능 모니터링이 활성화된 경우에만)
+      if (process.env.NODE_ENV === 'development' && isPerformanceMonitoringEnabled()) {
         console.log(`⏱️ Performance Measure: ${measureName} - ${duration.toFixed(2)}ms`);
       }
       
@@ -395,7 +408,7 @@ export const initCoreWebVitals = (): void => {
 const reportCoreWebVital = (metric: string, value: number): void => {
   const grade = getPerformanceGrade(metric as keyof typeof PERFORMANCE_THRESHOLDS, value);
   
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && isPerformanceMonitoringEnabled()) {
     console.log(`📊 ${metric}: ${value.toFixed(2)} (${grade})`);
   }
 
@@ -535,8 +548,8 @@ export const initPerformanceMonitoring = (): void => {
       performanceData.renderMetrics.componentRenderTimes = {};
     }, 60 * 60 * 1000);
     
-    // 개발 환경에서 성능 정보 출력
-    if (process.env.NODE_ENV === 'development') {
+    // 개발 환경에서 성능 정보 출력 (성능 모니터링이 활성화된 경우에만)
+    if (process.env.NODE_ENV === 'development' && isPerformanceMonitoringEnabled()) {
       console.log('🔍 Advanced performance monitoring initialized');
     }
   }

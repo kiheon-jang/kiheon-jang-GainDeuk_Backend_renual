@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { mark, measure, measureApiRequest, measureUserInteraction } from '@/utils/performance';
+import { storage } from '@/utils/storage';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -11,6 +12,18 @@ interface PerformanceMetrics {
   updateCount: number;
   lastUpdateTime: number;
 }
+
+/**
+ * 성능 모니터링이 활성화되어 있는지 확인
+ */
+const isPerformanceMonitoringEnabled = (): boolean => {
+  try {
+    const settings = storage.get('user-settings');
+    return settings?.app?.performanceMonitoring ?? true; // 기본값은 true
+  } catch {
+    return true; // 오류 시 기본값은 true
+  }
+};
 
 /**
  * 컴포넌트 성능 모니터링 훅
@@ -37,7 +50,7 @@ export const usePerformanceMonitoring = (componentName: string) => {
       const unmountTime = performance.now();
       const totalMountTime = unmountTime - mountTimeRef.current;
       
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === 'development' && isPerformanceMonitoringEnabled()) {
         console.log(`🔧 ${componentName} total mount time: ${totalMountTime.toFixed(2)}ms`);
       }
     };
@@ -64,7 +77,7 @@ export const usePerformanceMonitoring = (componentName: string) => {
       componentName
     );
     
-    if (process.env.NODE_ENV === 'development' && duration && shouldLog) {
+    if (process.env.NODE_ENV === 'development' && isPerformanceMonitoringEnabled() && duration && shouldLog) {
       console.log(`🎨 ${componentName} render time: ${duration.toFixed(2)}ms (update #${metricsRef.current.updateCount})`);
     }
   }, [componentName]); // componentName을 의존성으로 추가

@@ -176,16 +176,16 @@ const CoinCard: React.FC<CoinCardProps> = ({ coin, isRecommended = false, onClic
       </PriceSection>
 
       <MarketInfo>
-        {coin.marketCap && (
+        {coin.marketCap ? (
           <MarketCap>
             시가총액: {formatPrice(coin.marketCap, true)}
           </MarketCap>
-        )}
-        {coin.volume && (
+        ) : null}
+        {coin.volume ? (
           <Volume>
             거래량: {formatPrice(coin.volume, true)}
           </Volume>
-        )}
+        ) : null}
       </MarketInfo>
     </Card>
   );

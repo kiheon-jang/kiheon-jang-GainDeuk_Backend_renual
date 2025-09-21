@@ -135,19 +135,41 @@ const MiddleInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  min-width: 80px;
+  gap: 0.5rem;
+  min-width: 100px;
   flex-shrink: 0;
+  padding: 0 0.5rem;
 
   ${media.max.sm`
-    min-width: 60px;
+    min-width: 80px;
+    gap: 0.375rem;
+    padding: 0 0.25rem;
+  `}
+`;
+
+const InfoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+`;
+
+const InfoLabel = styled.div`
+  font-size: 0.625rem;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-weight: 500;
+  text-align: center;
+  opacity: 0.8;
+
+  ${media.max.sm`
+    font-size: 0.5rem;
   `}
 `;
 
 const Timeframe = styled.div`
   font-size: 0.75rem;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-weight: 500;
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-weight: 600;
   text-align: center;
 
   ${media.max.sm`
@@ -170,12 +192,15 @@ const SignalInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  min-width: 80px;
+  gap: 0.375rem;
+  min-width: 100px;
   flex-shrink: 0;
+  padding: 0 0.5rem;
 
   ${media.max.sm`
-    min-width: 60px;
+    min-width: 80px;
+    gap: 0.25rem;
+    padding: 0 0.25rem;
   `}
 `;
 
@@ -183,7 +208,7 @@ const SignalBadge = styled.div<{ $signalType: 'BUY' | 'SELL' | 'HOLD' }>`
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.375rem 0.75rem;
   border-radius: ${({ theme }) => theme.borderRadius.SM};
   background: ${({ $signalType }) => getSignalColor($signalType)}20;
   color: ${({ $signalType }) => getSignalColor($signalType)};
@@ -193,7 +218,7 @@ const SignalBadge = styled.div<{ $signalType: 'BUY' | 'SELL' | 'HOLD' }>`
 
   ${media.max.sm`
     font-size: 0.625rem;
-    padding: 0.2rem 0.4rem;
+    padding: 0.25rem 0.5rem;
   `}
 `;
 
@@ -214,13 +239,23 @@ const PriceInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.25rem;
-  min-width: 80px;
+  gap: 0.375rem;
+  min-width: 100px;
   flex-shrink: 0;
+  padding: 0 0.5rem;
 
   ${media.max.sm`
-    min-width: 60px;
+    min-width: 80px;
+    gap: 0.25rem;
+    padding: 0 0.25rem;
   `}
+`;
+
+const PriceInfoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
 `;
 
 const Price = styled.div`
@@ -497,7 +532,6 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
 
   const coinIcon = getCoinIcon(signal.symbol);
   const coinColor = getCoinColor(signal.symbol);
-  const signalColor = getSignalColor(signal.action);
   const signalText = getSignalText(signal.action);
 
   const handleCardClick = () => {
@@ -536,11 +570,18 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
         </CoinInfo>
         
         <MiddleInfo>
-          <Timeframe>{signal.timeframe}</Timeframe>
-          <ExpectedReturn>+15%</ExpectedReturn>
+          <InfoItem>
+            <InfoLabel>전략시간대</InfoLabel>
+            <Timeframe>{signal.timeframe}</Timeframe>
+          </InfoItem>
+          <InfoItem>
+            <InfoLabel>예상수익률</InfoLabel>
+            <ExpectedReturn>+15%</ExpectedReturn>
+          </InfoItem>
         </MiddleInfo>
 
         <SignalInfo>
+          <InfoLabel>매매신호</InfoLabel>
           <SignalBadge $signalType={signal.action}>
             <SignalIcon $signalType={signal.action}>
               {getSignalIcon()}
@@ -550,8 +591,14 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
         </SignalInfo>
 
         <PriceInfo>
-          <Price>${formatPrice(signal.price)}</Price>
-          <Confidence>{signal.confidence}</Confidence>
+          <PriceInfoItem>
+            <InfoLabel>현재가격</InfoLabel>
+            <Price>${formatPrice(signal.price)}</Price>
+          </PriceInfoItem>
+          <PriceInfoItem>
+            <InfoLabel>신뢰도</InfoLabel>
+            <Confidence>{signal.confidence}</Confidence>
+          </PriceInfoItem>
         </PriceInfo>
 
         <ExpandButton onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}>

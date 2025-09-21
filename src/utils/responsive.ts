@@ -199,7 +199,99 @@ export const touchFriendly = css`
 `;
 
 // 반응형 타이포그래피
-export const responsiveTypography = {
+export const responsiveTypography = (size: string, weight?: string) => {
+  const sizeMap: { [key: string]: any } = {
+    xs: css`
+      font-size: 0.75rem;
+      line-height: 1.4;
+      
+      ${media.min.sm`
+        font-size: 0.875rem;
+      `}
+    `,
+    sm: css`
+      font-size: 0.875rem;
+      line-height: 1.4;
+      
+      ${media.min.sm`
+        font-size: 1rem;
+      `}
+    `,
+    md: css`
+      font-size: 1rem;
+      line-height: 1.5;
+      
+      ${media.min.sm`
+        font-size: 1.125rem;
+      `}
+    `,
+    lg: css`
+      font-size: 1.125rem;
+      line-height: 1.4;
+      
+      ${media.min.sm`
+        font-size: 1.25rem;
+      `}
+      
+      ${media.min.lg`
+        font-size: 1.5rem;
+      `}
+    `,
+    xl: css`
+      font-size: 1.25rem;
+      line-height: 1.3;
+      
+      ${media.min.sm`
+        font-size: 1.5rem;
+      `}
+      
+      ${media.min.lg`
+        font-size: 1.875rem;
+      `}
+    `,
+    '2xl': css`
+      font-size: 1.5rem;
+      line-height: 1.2;
+      
+      ${media.min.sm`
+        font-size: 1.875rem;
+      `}
+      
+      ${media.min.lg`
+        font-size: 2.25rem;
+      `}
+    `,
+    '3xl': css`
+      font-size: 1.875rem;
+      line-height: 1.2;
+      
+      ${media.min.sm`
+        font-size: 2.25rem;
+      `}
+      
+      ${media.min.lg`
+        font-size: 3rem;
+      `}
+    `,
+  };
+
+  const weightMap: { [key: string]: string } = {
+    light: '300',
+    normal: '400',
+    medium: '500',
+    semibold: '600',
+    bold: '700',
+    extrabold: '800',
+  };
+
+  return css`
+    ${sizeMap[size] || sizeMap.md}
+    ${weight && weightMap[weight] ? `font-weight: ${weightMap[weight]};` : ''}
+  `;
+};
+
+// 기존 객체 형태도 유지 (하위 호환성을 위해)
+export const typography = {
   h1: css`
     font-size: 1.875rem;
     line-height: 1.2;

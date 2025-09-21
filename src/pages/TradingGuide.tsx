@@ -10,7 +10,7 @@ import { useTradingSignals, useExecuteTrade } from '@/hooks/useApi';
 import { useRealTimeData, useNetworkStatus } from '@/hooks/useRealTimeData';
 import { media, responsiveTypography, responsiveSpacing } from '@/utils/responsive';
 // import { useOptimisticUpdates } from '@/hooks/useOptimisticUpdates';
-import type { TradingSignal } from '@/types';
+import type { ApiTradingSignal } from '@/types';
 
 const TradingContainer = styled.div`
   display: flex;
@@ -199,14 +199,14 @@ const TradingGuide: React.FC = () => {
 
   // 필터링된 신호들
   const filteredSignals = signals?.filter(signal => 
-    selectedStrategy === 'all' || signal.timeframe.strategy === selectedStrategy
+    selectedStrategy === 'all' || signal.timeframe === selectedStrategy
   ) || [];
 
   // 통계 계산
   const totalSignals = signals?.length || 0;
-  const buySignals = signals?.filter(s => s.signal.action === 'BUY').length || 0;
-  const sellSignals = signals?.filter(s => s.signal.action === 'SELL').length || 0;
-  const holdSignals = signals?.filter(s => s.signal.action === 'HOLD').length || 0;
+  const buySignals = signals?.filter(s => s.action === 'BUY').length || 0;
+  const sellSignals = signals?.filter(s => s.action === 'SELL').length || 0;
+  const holdSignals = signals?.filter(s => s.action === 'HOLD').length || 0;
 
   const handleExecuteTrade = (signalId: string, action: 'BUY' | 'SELL', amount: number, price: number) => {
     executeTradeMutation.mutate(

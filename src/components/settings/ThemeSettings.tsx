@@ -122,12 +122,12 @@ const ColorPicker = styled.div`
   align-items: center;
 `;
 
-const ColorOption = styled.button<{ color: string; isSelected: boolean }>`
+const ColorOption = styled.button<{ color: string; $isSelected: boolean }>`
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  border: 3px solid ${({ isSelected, theme }) => 
-    isSelected ? theme.colors.primary : 'transparent'};
+  border: 3px solid ${({ $isSelected, theme }) => 
+    $isSelected ? theme.colors.primary : 'transparent'};
   background-color: ${({ color }) => color};
   cursor: pointer;
   transition: ${({ theme }) => theme.transitions.FAST};
@@ -147,7 +147,7 @@ const ColorOption = styled.button<{ color: string; isSelected: boolean }>`
     height: 1rem;
     border-radius: 50%;
     background: white;
-    opacity: ${({ isSelected }) => isSelected ? 1 : 0};
+    opacity: ${({ $isSelected }) => $isSelected ? 1 : 0};
     transition: opacity ${({ theme }) => theme.transitions.FAST};
   }
 `;
@@ -282,7 +282,7 @@ const ThemeSettings: React.FC<ThemeSettingsProps> = ({ settings, onUpdate }) => 
                 <ColorOption
                   key={color.value}
                   color={color.value}
-                  isSelected={settings.primaryColor === color.value}
+                  $isSelected={settings.primaryColor === color.value}
                   onClick={() => handleColorChange(color.value)}
                   title={color.name}
                 />

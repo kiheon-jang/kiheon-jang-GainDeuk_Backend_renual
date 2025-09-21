@@ -6,8 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:analyze": "ANALYZE=true tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "analyze": "npm run build:analyze",
+    "size": "npm run build && npx vite-bundle-analyzer dist",
+    "analyze:deps": "node scripts/analyze-dependencies.js",
+    "optimize": "npm run analyze:deps && npm run analyze"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.89.0",
@@ -30,8 +35,11 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "terser": "^5.36.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.43.0",
-    "vite": "^7.1.6"
+    "vite": "^7.1.6",
+    "vite-bundle-analyzer": "^0.11.0"
   }
 }

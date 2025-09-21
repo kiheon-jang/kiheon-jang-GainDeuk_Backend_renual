@@ -101,18 +101,18 @@ const Select = styled.select`
   }
 `;
 
-const SortButton = styled.button<{ isActive: boolean }>`
+const SortButton = styled.button<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border: 2px solid ${({ theme, isActive }) => 
-    isActive ? theme.colors.primary : theme.colors.border.primary};
+  border: 2px solid ${({ theme, $isActive }) => 
+    $isActive ? theme.colors.primary : theme.colors.border.primary};
   border-radius: ${({ theme }) => theme.borderRadius.MD};
-  background: ${({ theme, isActive }) => 
-    isActive ? theme.colors.primary : theme.colors.background.primary};
-  color: ${({ theme, isActive }) => 
-    isActive ? 'white' : theme.colors.text.primary};
+  background: ${({ theme, $isActive }) => 
+    $isActive ? theme.colors.primary : theme.colors.background.primary};
+  color: ${({ theme, $isActive }) => 
+    $isActive ? 'white' : theme.colors.text.primary};
   font-size: ${({ theme }) => theme.fonts.size.SM};
   font-weight: 600;
   transition: ${({ theme }) => theme.transitions.FAST};
@@ -120,8 +120,8 @@ const SortButton = styled.button<{ isActive: boolean }>`
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
-    background: ${({ theme, isActive }) => 
-      isActive ? theme.colors.primary : theme.colors.primary}15;
+    background: ${({ theme, $isActive }) => 
+      $isActive ? theme.colors.primary : theme.colors.primary}15;
   }
 `;
 
@@ -190,7 +190,7 @@ const CoinSearchAndFilter: React.FC<CoinSearchAndFilterProps> = ({
         <FilterGroup>
           <FilterLabel>정렬:</FilterLabel>
           <SortButton
-            isActive={sortBy === 'marketCap'}
+            $isActive={sortBy === 'marketCap'}
             onClick={() => handleSortChange('marketCap')}
           >
             시가총액
@@ -200,7 +200,7 @@ const CoinSearchAndFilter: React.FC<CoinSearchAndFilterProps> = ({
           </SortButton>
           
           <SortButton
-            isActive={sortBy === 'price'}
+            $isActive={sortBy === 'price'}
             onClick={() => handleSortChange('price')}
           >
             가격
@@ -210,7 +210,7 @@ const CoinSearchAndFilter: React.FC<CoinSearchAndFilterProps> = ({
           </SortButton>
           
           <SortButton
-            isActive={sortBy === 'change24h'}
+            $isActive={sortBy === 'change24h'}
             onClick={() => handleSortChange('change24h')}
           >
             24h 변동
@@ -220,7 +220,7 @@ const CoinSearchAndFilter: React.FC<CoinSearchAndFilterProps> = ({
           </SortButton>
           
           <SortButton
-            isActive={sortBy === 'volume'}
+            $isActive={sortBy === 'volume'}
             onClick={() => handleSortChange('volume')}
           >
             거래량

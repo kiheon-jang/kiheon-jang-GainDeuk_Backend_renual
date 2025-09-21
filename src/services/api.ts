@@ -3,6 +3,7 @@ import type {
   DashboardData, 
   CoinRecommendation, 
   TradingSignal, 
+  ApiTradingSignal,
   UserProfile, 
   Coin, 
   ApiResponse, 
@@ -83,57 +84,145 @@ class ApiClient {
     return errorMessages[status] || '알 수 없는 오류가 발생했습니다.';
   }
 
-  // 대시보드 데이터 조회
+  // 대시보드 데이터 조회 (signals와 coins를 조합하여 대시보드 데이터 구성)
   async getDashboardData(userId?: string): Promise<DashboardData> {
     try {
-      const response = await this.client.get<ApiResponse<DashboardData>>('/dashboard', {
-        params: { userId }
-      });
-      return response.data.data;
+      // 백엔드에 dashboard 엔드포인트가 없으므로 signals와 coins를 조합
+      const [signalsResponse, coinsResponse] = await Promise.all([
+        this.client.get<ApiResponse<any[]>>('/signals', {
+          params: { userId, limit: 10 }
+        }),
+        this.client.get<ApiResponse<any[]>>('/coins', {
+          params: { limit: 20 }
+        })
+      ]);
+      
+      // 대시보드 데이터 구조로 변환
+      const dashboardData: DashboardData = {
+        recommendations: signalsResponse.data.data.map(signal => ({
+          id: signal._id,
+          coinId: signal.coinId,
+          symbol: signal.symbol,
+          name: signal.name,
+          currentPrice: signal.currentPrice,
+          recommendation: signal.recommendation.action,
+          confidence: signal.recommendation.confidence,
+          score: signal.finalScore,
+          timeframe: signal.timeframe,
+          priority: signal.priority,
+          reason: `점수: ${signal.finalScore}, 신뢰도: ${signal.recommendation.confidence}`,
+          createdAt: signal.createdAt
+        })),
+        tradingSignals: signalsResponse.data.data.map(signal => ({
+          id: signal._id,
+          coinId: signal.coinId,
+          symbol: signal.symbol,
+          name: signal.name,
+          action: signal.recommendation.action,
+          confidence: signal.recommendation.confidence,
+          price: signal.currentPrice,
+          timeframe: signal.timeframe,
+          priority: signal.priority,
+          score: signal.finalScore,
+          createdAt: signal.createdAt
+        })),
+        marketOverview: {
+          totalCoins: coinsResponse.data.pagination?.total || 0,
+          totalSignals: signalsResponse.data.pagination?.total || 0,
+          activeAlerts: 0, // alerts 엔드포인트에서 가져올 수 있음
+          lastUpdated: new Date().toISOString()
+        }
+      };
+      
+      return dashboardData;
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
       throw error;
     }
   }
 
-  // AI 추천 코인 조회
+  // AI 추천 코인 조회 (signals 엔드포인트를 사용)
   async getRecommendations(userId?: string): Promise<CoinRecommendation[]> {
     try {
-      const response = await this.client.get<ApiResponse<CoinRecommendation[]>>('/recommendations', {
-        params: { userId }
+      const response = await this.client.get<ApiResponse<any[]>>('/signals', {
+        params: { userId, limit: 50 }
       });
-      return response.data.data;
+      
+      // signals 데이터를 CoinRecommendation 형태로 변환
+      return response.data.data.map(signal => ({
+        id: signal._id,
+        coinId: signal.coinId,
+        symbol: signal.symbol,
+        name: signal.name,
+        currentPrice: signal.currentPrice,
+        recommendation: signal.recommendation.action,
+        confidence: signal.recommendation.confidence,
+        score: signal.finalScore,
+        timeframe: signal.timeframe,
+        priority: signal.priority,
+        reason: `점수: ${signal.finalScore}, 신뢰도: ${signal.recommendation.confidence}`,
+        createdAt: signal.createdAt
+      }));
     } catch (error) {
       console.error('Failed to fetch recommendations:', error);
       throw error;
     }
   }
 
-  // 실시간 매매 신호 조회
-  async getTradingSignals(userId?: string, strategy?: string): Promise<TradingSignal[]> {
+  // 실시간 매매 신호 조회 (signals 엔드포인트 사용)
+  async getTradingSignals(userId?: string, strategy?: string): Promise<ApiTradingSignal[]> {
     try {
-      const response = await this.client.get<ApiResponse<TradingSignal[]>>('/trading/signals', {
-        params: { userId, strategy }
+      const response = await this.client.get<ApiResponse<any[]>>('/signals', {
+        params: { userId, strategy, limit: 50 }
       });
-      return response.data.data;
+      
+      // signals 데이터를 TradingSignal 형태로 변환
+      return response.data.data.map(signal => ({
+        id: signal._id,
+        coinId: signal.coinId,
+        symbol: signal.symbol,
+        name: signal.name,
+        action: signal.recommendation.action,
+        confidence: signal.recommendation.confidence,
+        price: signal.currentPrice,
+        timeframe: signal.timeframe,
+        priority: signal.priority,
+        score: signal.finalScore,
+        createdAt: signal.createdAt
+      }));
     } catch (error) {
       console.error('Failed to fetch trading signals:', error);
       throw error;
     }
   }
 
-  // 매매 신호 상세 정보 조회
+  // 매매 신호 상세 정보 조회 (signals 엔드포인트 사용)
   async getTradingSignalDetail(signalId: string): Promise<TradingSignal> {
     try {
-      const response = await this.client.get<ApiResponse<TradingSignal>>(`/trading/signals/${signalId}`);
-      return response.data.data;
+      const response = await this.client.get<ApiResponse<any>>(`/signals/${signalId}`);
+      
+      // signal 데이터를 TradingSignal 형태로 변환
+      const signal = response.data.data;
+      return {
+        id: signal._id,
+        coinId: signal.coinId,
+        symbol: signal.symbol,
+        name: signal.name,
+        action: signal.recommendation.action,
+        confidence: signal.recommendation.confidence,
+        price: signal.currentPrice,
+        timeframe: signal.timeframe,
+        priority: signal.priority,
+        score: signal.finalScore,
+        createdAt: signal.createdAt
+      };
     } catch (error) {
       console.error('Failed to fetch trading signal detail:', error);
       throw error;
     }
   }
 
-  // 매매 실행
+  // 매매 실행 (현재 백엔드에 구현되지 않음 - 임시 구현)
   async executeTrade(tradeData: {
     signalId: string;
     action: 'BUY' | 'SELL';
@@ -141,19 +230,36 @@ class ApiClient {
     price: number;
   }): Promise<TradeExecution> {
     try {
-      const response = await this.client.post<ApiResponse<TradeExecution>>('/trading/execute', tradeData);
-      return response.data.data;
+      // 백엔드에 trading/execute 엔드포인트가 없으므로 임시로 시뮬레이션
+      console.warn('매매 실행 기능은 백엔드에 구현되지 않았습니다. 시뮬레이션 모드로 실행됩니다.');
+      
+      const mockExecution: TradeExecution = {
+        id: `trade_${Date.now()}`,
+        signalId: tradeData.signalId,
+        action: tradeData.action,
+        amount: tradeData.amount,
+        price: tradeData.price,
+        status: 'PENDING',
+        executedAt: new Date().toISOString(),
+        message: '매매 실행이 요청되었습니다. (시뮬레이션 모드)'
+      };
+      
+      return mockExecution;
     } catch (error) {
       console.error('Failed to execute trade:', error);
       throw error;
     }
   }
 
-  // 사용자 성향 분석
+  // 사용자 성향 분석 (user-profiles 엔드포인트 사용)
   async analyzeUserProfile(testAnswers: any[]): Promise<UserProfile> {
     try {
-      const response = await this.client.post<ApiResponse<UserProfile>>('/analyze-profile', {
-        answers: testAnswers
+      // 백엔드의 user-profiles 엔드포인트를 사용하여 프로필 생성
+      const response = await this.client.post<ApiResponse<UserProfile>>('/user-profiles', {
+        answers: testAnswers,
+        riskTolerance: 'MEDIUM', // 기본값
+        investmentGoal: 'GROWTH', // 기본값
+        timeHorizon: 'LONG_TERM' // 기본값
       });
       return response.data.data;
     } catch (error) {
@@ -174,21 +280,47 @@ class ApiClient {
     }
   }
 
-  // 투자 성향 테스트 질문 조회
+  // 투자 성향 테스트 질문 조회 (임시 구현)
   async getInvestmentTest(): Promise<InvestmentTest> {
     try {
-      const response = await this.client.get<ApiResponse<InvestmentTest>>('/investment-test');
-      return response.data.data;
+      // 백엔드에 investment-test 엔드포인트가 없으므로 임시로 하드코딩된 질문 반환
+      const mockTest: InvestmentTest = {
+        id: 'investment_test_1',
+        title: '투자 성향 테스트',
+        description: '당신의 투자 성향을 파악하기 위한 질문입니다.',
+        questions: [
+          {
+            id: 'q1',
+            question: '투자 목표는 무엇인가요?',
+            options: [
+              { id: 'a1', text: '안정적인 수익', value: 'CONSERVATIVE' },
+              { id: 'a2', text: '적당한 성장', value: 'MODERATE' },
+              { id: 'a3', text: '높은 수익', value: 'AGGRESSIVE' }
+            ]
+          },
+          {
+            id: 'q2',
+            question: '투자 기간은 얼마나 되나요?',
+            options: [
+              { id: 'b1', text: '1년 이하', value: 'SHORT_TERM' },
+              { id: 'b2', text: '1-3년', value: 'MEDIUM_TERM' },
+              { id: 'b3', text: '3년 이상', value: 'LONG_TERM' }
+            ]
+          }
+        ]
+      };
+      
+      return mockTest;
     } catch (error) {
       console.error('Failed to fetch investment test:', error);
       throw error;
     }
   }
 
-  // 사용자 프로필 저장
+  // 사용자 프로필 저장 (user-profiles 엔드포인트 사용)
   async saveUserProfile(profile: UserProfile): Promise<UserProfile> {
     try {
-      const response = await this.client.post<ApiResponse<UserProfile>>('/user-profile', profile);
+      const response = await this.client.post<ApiResponse<UserProfile>>('/user-profiles', profile);
       return response.data.data;
     } catch (error) {
       console.error('Failed to save user profile:', error);
@@ -196,10 +328,10 @@ class ApiClient {
     }
   }
 
-  // 사용자 프로필 조회
+  // 사용자 프로필 조회 (user-profiles 엔드포인트 사용)
   async getUserProfile(userId: string): Promise<UserProfile> {
     try {
-      const response = await this.client.get<ApiResponse<UserProfile>>(`/user-profile/${userId}`);
+      const response = await this.client.get<ApiResponse<UserProfile>>(`/user-profiles/${userId}`);
       return response.data.data;
     } catch (error) {
       console.error('Failed to fetch user profile:', error);
@@ -221,7 +353,7 @@ class ApiClient {
       if (sortOrder) params.append('sortOrder', sortOrder);
       if (filterBy) params.append('filter', filterBy);
       
-      const response = await this.client.get<ApiResponse<Coin[]>>(`/coins?${params.toString()}`);
+      const response = await this.client.get<ApiResponse<Coin[]>>(`/coins?${params.toString()}&limit=100`);
       return response.data.data;
     } catch (error) {
       console.error('Failed to fetch coins:', error);

@@ -8,9 +8,12 @@ import type {
 
 // 대시보드 데이터 훅
 export const useDashboardData = (userId?: string) => {
+  // userId가 없을 때 기본값 사용
+  const effectiveUserId = userId || 'default';
+  
   return useQuery({
-    queryKey: QUERY_KEYS.DASHBOARD_DATA(userId),
-    queryFn: () => api.getDashboardData(userId),
+    queryKey: QUERY_KEYS.DASHBOARD_DATA(effectiveUserId),
+    queryFn: () => api.getDashboardData(effectiveUserId),
     refetchInterval: 30000, // 30초마다 새로고침
     staleTime: 15000, // 15초간 캐시 유지
     refetchOnWindowFocus: true, // 창 포커스 시 즉시 새로고침
@@ -22,9 +25,12 @@ export const useDashboardData = (userId?: string) => {
 
 // AI 추천 코인 훅
 export const useRecommendations = (userId?: string) => {
+  // userId가 없을 때 기본값 사용
+  const effectiveUserId = userId || 'default';
+  
   return useQuery({
-    queryKey: QUERY_KEYS.RECOMMENDATIONS_DATA(userId),
-    queryFn: () => api.getRecommendations(userId),
+    queryKey: QUERY_KEYS.RECOMMENDATIONS_DATA(effectiveUserId),
+    queryFn: () => api.getRecommendations(effectiveUserId),
     refetchInterval: 30000, // 30초마다 새로고침
     staleTime: 10000, // 10초간 캐시 유지
     refetchOnWindowFocus: true, // 창 포커스 시 즉시 새로고침
@@ -36,9 +42,12 @@ export const useRecommendations = (userId?: string) => {
 
 // 실시간 매매 신호 훅 (핵심!)
 export const useTradingSignals = (userId?: string, strategy?: string) => {
+  // userId가 없을 때 기본값 사용
+  const effectiveUserId = userId || 'default';
+  
   return useQuery({
-    queryKey: QUERY_KEYS.TRADING_SIGNALS_DATA(userId, strategy),
-    queryFn: () => api.getTradingSignals(userId, strategy),
+    queryKey: QUERY_KEYS.TRADING_SIGNALS_DATA(effectiveUserId, strategy),
+    queryFn: () => api.getTradingSignals(effectiveUserId, strategy),
     refetchInterval: 10000, // 10초마다 새로고침 (매매는 빠른 판단이 중요!)
     staleTime: 5000, // 5초간 캐시 유지
     refetchOnWindowFocus: true, // 창 포커스 시 즉시 새로고침

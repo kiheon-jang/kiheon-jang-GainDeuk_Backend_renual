@@ -108,6 +108,21 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+// API에서 반환하는 실제 매매 신호 타입 (백엔드 signals 엔드포인트)
+export interface ApiTradingSignal {
+  id: string;
+  coinId: string;
+  symbol: string;
+  name: string;
+  action: 'BUY' | 'SELL' | 'HOLD';
+  confidence: string;
+  price: number;
+  timeframe: string;
+  priority: string;
+  score: number;
+  createdAt: string;
+}
+
 // 매매 실행 타입
 export interface TradeExecution {
   signalId: string;

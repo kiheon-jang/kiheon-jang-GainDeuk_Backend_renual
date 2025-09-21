@@ -33,7 +33,9 @@ export const useRealTimeData = () => {
     strategy?: string,
     onNewSignal?: (signal: TradingSignal) => void
   ) => {
-    const queryKey = `trading-signals-${userId}-${strategy}`;
+    // userId가 없을 때 기본값 사용
+    const effectiveUserId = userId || 'default';
+    const queryKey = `trading-signals-${effectiveUserId}-${strategy}`;
     
     // 기존 업데이트 중지
     stopQueryUpdates(queryKey);
@@ -42,17 +44,17 @@ export const useRealTimeData = () => {
       try {
         // 현재 캐시된 데이터 가져오기
         const currentData = queryClient.getQueryData(
-          QUERY_KEYS.TRADING_SIGNALS_DATA(userId, strategy)
+          QUERY_KEYS.TRADING_SIGNALS_DATA(effectiveUserId, strategy)
         ) as TradingSignal[] | undefined;
 
         // 새로운 데이터 가져오기
         await queryClient.invalidateQueries({
-          queryKey: QUERY_KEYS.TRADING_SIGNALS_DATA(userId, strategy),
+          queryKey: QUERY_KEYS.TRADING_SIGNALS_DATA(effectiveUserId, strategy),
         });
 
         // 새로운 데이터 확인
         const newData = queryClient.getQueryData(
-          QUERY_KEYS.TRADING_SIGNALS_DATA(userId, strategy)
+          QUERY_KEYS.TRADING_SIGNALS_DATA(effectiveUserId, strategy)
         ) as TradingSignal[] | undefined;
 
         // 새로운 신호가 있는지 확인
@@ -106,7 +108,9 @@ export const useRealTimeData = () => {
     userId?: string,
     onNewRecommendation?: (recommendation: CoinRecommendation) => void
   ) => {
-    const queryKey = `dashboard-${userId}`;
+    // userId가 없을 때 기본값 사용
+    const effectiveUserId = userId || 'default';
+    const queryKey = `dashboard-${effectiveUserId}`;
     
     // 기존 업데이트 중지
     stopQueryUpdates(queryKey);
@@ -115,17 +119,17 @@ export const useRealTimeData = () => {
       try {
         // 현재 캐시된 데이터 가져오기
         const currentData = queryClient.getQueryData(
-          QUERY_KEYS.DASHBOARD_DATA(userId)
+          QUERY_KEYS.DASHBOARD_DATA(effectiveUserId)
         ) as any;
 
         // 새로운 데이터 가져오기
         await queryClient.invalidateQueries({
-          queryKey: QUERY_KEYS.DASHBOARD_DATA(userId),
+          queryKey: QUERY_KEYS.DASHBOARD_DATA(effectiveUserId),
         });
 
         // 새로운 데이터 확인
         const newData = queryClient.getQueryData(
-          QUERY_KEYS.DASHBOARD_DATA(userId)
+          QUERY_KEYS.DASHBOARD_DATA(effectiveUserId)
         ) as any;
 
         // 새로운 추천이 있는지 확인

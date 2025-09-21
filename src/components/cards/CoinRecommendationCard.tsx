@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { 
   ChevronDown, 
@@ -15,6 +15,7 @@ import {
 import type { CoinRecommendation } from '@/types';
 import { getRiskColor, getRiskIcon, formatPrice, formatPercentage } from '@/utils';
 import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
+import { optimizedMemo } from '@/utils/reactOptimization';
 
 interface CoinRecommendationCardProps {
   recommendation: CoinRecommendation;
@@ -24,7 +25,7 @@ interface CoinRecommendationCardProps {
   isInWatchlist?: boolean;
 }
 
-const Card = styled.div<{ isExpanded?: boolean }>`
+const Card = styled.div<{ $isExpanded?: boolean }>`
   background: ${({ theme }) => theme.colors.background.primary};
   border-radius: ${({ theme }) => theme.borderRadius.LG};
   box-shadow: ${({ theme }) => theme.shadows.MD};
@@ -60,7 +61,7 @@ const Card = styled.div<{ isExpanded?: boolean }>`
     }
   }
 
-  ${({ isExpanded, theme }) => isExpanded && `
+  ${({ $isExpanded, theme }) => $isExpanded && `
     box-shadow: ${theme.shadows.XL};
     border-color: ${theme.colors.primary}60;
     
@@ -320,38 +321,43 @@ const CoinRecommendationCard: React.FC<CoinRecommendationCardProps> = ({
   const { coin, expectedReturn, riskLevel, reasons, confidence, timeframe } = recommendation;
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleCardClick = (e: React.MouseEvent) => {
+  // 메모이제이션된 핸들러들
+  const handleCardClick = useCallback((e: React.MouseEvent) => {
     // 액션 버튼 클릭 시에는 카드 클릭 이벤트 방지
     if ((e.target as HTMLElement).closest('button')) {
       return;
     }
     onClick?.();
-  };
+  }, [onClick]);
 
-  const handleAddToWatchlist = (e: React.MouseEvent) => {
+  const handleAddToWatchlist = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     onAddToWatchlist?.(coin.id);
-  };
+  }, [onAddToWatchlist, coin.id]);
 
-  const handleShare = (e: React.MouseEvent) => {
+  const handleShare = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     onShare?.(recommendation);
-  };
+  }, [onShare, recommendation]);
 
-  const handleExpand = (e: React.MouseEvent) => {
+  const handleExpand = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsExpanded(!isExpanded);
-  };
+    setIsExpanded(prev => !prev);
+  }, []);
 
-  const handleViewDetails = (e: React.MouseEvent) => {
+  const handleViewDetails = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     onClick?.();
-  };
+  }, [onClick]);
 
-  const additionalReasons = reasons.slice(3);
+  // 메모이제이션된 계산값들
+  const additionalReasons = useMemo(() => reasons.slice(3), [reasons]);
+  const mainReasons = useMemo(() => reasons.slice(0, 3), [reasons]);
+  const formattedPrice = useMemo(() => formatPrice(coin.currentPrice), [coin.currentPrice]);
+  const formattedReturn = useMemo(() => formatPercentage(expectedReturn), [expectedReturn]);
 
   return (
-    <Card isExpanded={isExpanded} onClick={handleCardClick}>
+    <Card $isExpanded={isExpanded} onClick={handleCardClick}>
       <AIIcon>
         <Star size={16} />
       </AIIcon>
@@ -361,14 +367,14 @@ const CoinRecommendationCard: React.FC<CoinRecommendationCardProps> = ({
         <CoinInfo>
           <CoinName>{coin.name}</CoinName>
           <CoinSymbol>{coin.symbol}</CoinSymbol>
-          <CoinPrice>{formatPrice(coin.currentPrice)}</CoinPrice>
+          <CoinPrice>{formattedPrice}</CoinPrice>
         </CoinInfo>
       </CoinHeader>
       
       <RecommendationInfo>
         <ExpectedReturn positive={expectedReturn > 0}>
           <TrendingUp size={16} />
-          {formatPercentage(expectedReturn)}
+          {formattedReturn}
         </ExpectedReturn>
         <RiskLevel level={riskLevel}>
           {getRiskIcon(riskLevel)} 위험도: {riskLevel}/5
@@ -380,7 +386,7 @@ const CoinRecommendationCard: React.FC<CoinRecommendationCardProps> = ({
       </RecommendationInfo>
       
       <ReasonsList>
-        {reasons.slice(0, 3).map((reason, index) => (
+        {mainReasons.map((reason, index) => (
           <ReasonItem key={index}>
             💡 {reason}
           </ReasonItem>
@@ -448,4 +454,8 @@ const CoinRecommendationCard: React.FC<CoinRecommendationCardProps> = ({
   );
 };
 
-export default CoinRecommendationCard;
+// React.memo로 최적화된 컴포넌트 내보내기
+export default optimizedMemo(CoinRecommendationCard, {
+  displayName: 'CoinRecommendationCard',
+  deep: false // 얕은 비교 사용 (기본값)
+});

@@ -112,13 +112,13 @@ const CurrentPrice = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const ChangeContainer = styled.div<{ isPositive: boolean }>`
+const ChangeContainer = styled.div<{ $isPositive: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: ${({ theme, isPositive }) => 
-    isPositive ? theme.colors.success : theme.colors.danger};
+  color: ${({ theme, $isPositive }) => 
+    $isPositive ? theme.colors.success : theme.colors.danger};
   font-size: ${({ theme }) => theme.fonts.size.LG};
   font-weight: 600;
 `;
@@ -230,7 +230,7 @@ const CoinDetailModal: React.FC<CoinDetailModalProps> = ({ coin, isOpen, onClose
         <ModalBody>
           <PriceSection>
             <CurrentPrice>{formatPrice(coin.currentPrice)}</CurrentPrice>
-            <ChangeContainer isPositive={isPositive}>
+            <ChangeContainer $isPositive={isPositive}>
               <ChangeIcon size={20} />
               {formatPercentage(coin.change24h)}
             </ChangeContainer>

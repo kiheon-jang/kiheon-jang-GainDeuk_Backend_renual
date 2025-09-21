@@ -7,6 +7,8 @@ import LanguageSettingsComponent from '@/components/settings/LanguageSettings';
 import ThemeSettingsComponent from '@/components/settings/ThemeSettings';
 import AppSettingsComponent from '@/components/settings/AppSettings';
 import SettingsManagement from '@/components/settings/SettingsManagement';
+import PerformanceSettings from '@/components/settings/PerformanceSettings';
+import CachingSettings from '@/components/settings/CachingSettings';
 import NotificationSettings from '@/components/notifications/NotificationSettings';
 import NotificationHistory from '@/components/notifications/NotificationHistory';
 import { useSettings } from '@/hooks/useSettings';
@@ -95,6 +97,10 @@ const Settings: React.FC = () => {
           settings={settings.app}
           onUpdate={updateAppSettings}
         />
+
+        <PerformanceSettings />
+
+        <CachingSettings />
 
         <SettingsManagement
           onReset={resetSettings}

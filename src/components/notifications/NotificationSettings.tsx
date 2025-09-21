@@ -163,7 +163,7 @@ const ToggleSwitch = styled.label<{ checked: boolean }>`
   }
 `;
 
-const TestButton = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' }>`
+const TestButton = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -175,8 +175,8 @@ const TestButton = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' 
   cursor: pointer;
   border: 1px solid transparent;
 
-  ${({ variant, theme }) => {
-    switch (variant) {
+  ${({ $variant, theme }) => {
+    switch ($variant) {
       case 'primary':
         return `
           background: ${theme.colors.primary};
@@ -418,7 +418,7 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               <TestButton onClick={() => onTestNotification('success')}>
                 ✅ 성공
               </TestButton>
-              <TestButton variant="danger" onClick={() => onTestNotification('error')}>
+              <TestButton $variant="danger" onClick={() => onTestNotification('error')}>
                 ❌ 오류
               </TestButton>
               <TestButton onClick={() => onTestNotification('warning')}>
@@ -427,10 +427,10 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({
               <TestButton onClick={() => onTestNotification('info')}>
                 ℹ️ 정보
               </TestButton>
-              <TestButton variant="primary" onClick={() => onTestNotification('trading_signal')}>
+              <TestButton $variant="primary" onClick={() => onTestNotification('trading_signal')}>
                 📈 매매신호
               </TestButton>
-              <TestButton variant="primary" onClick={() => onTestNotification('price_alert')}>
+              <TestButton $variant="primary" onClick={() => onTestNotification('price_alert')}>
                 💰 가격알림
               </TestButton>
             </TestButtonsGrid>

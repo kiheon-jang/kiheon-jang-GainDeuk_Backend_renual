@@ -14,11 +14,11 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   fullWidth?: boolean;
 }
 
-const InputContainer = styled.div<{ fullWidth?: boolean }>`
+const InputContainer = styled.div<{ $fullWidth?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  width: ${({ fullWidth }) => fullWidth ? '100%' : 'auto'};
+  width: ${({ $fullWidth }) => $fullWidth ? '100%' : 'auto'};
 `;
 
 const Label = styled.label`
@@ -27,25 +27,25 @@ const Label = styled.label`
   color: ${({ theme }) => theme.colors.text.primary};
 `;
 
-const InputWrapper = styled.div<{ hasError?: boolean; isFocused?: boolean }>`
+const InputWrapper = styled.div<{ $hasError?: boolean; $isFocused?: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
-  border: 1px solid ${({ theme, hasError }) => 
-    hasError ? theme.colors.danger : theme.colors.border.primary};
+  border: 1px solid ${({ theme, $hasError }) => 
+    $hasError ? theme.colors.danger : theme.colors.border.primary};
   background: ${({ theme }) => theme.colors.background.primary};
   transition: ${({ theme }) => theme.transitions.FAST};
   overflow: hidden;
 
   &:focus-within {
-    border-color: ${({ theme, hasError }) => 
-      hasError ? theme.colors.danger : theme.colors.border.focus};
-    box-shadow: 0 0 0 3px ${({ theme, hasError }) => 
-      hasError ? `${theme.colors.danger}20` : `${theme.colors.primary}20`};
+    border-color: ${({ theme, $hasError }) => 
+      $hasError ? theme.colors.danger : theme.colors.border.focus};
+    box-shadow: 0 0 0 3px ${({ theme, $hasError }) => 
+      $hasError ? `${theme.colors.danger}20` : `${theme.colors.primary}20`};
   }
 
-  ${({ isFocused }) => isFocused && css`
+  ${({ $isFocused }) => $isFocused && css`
     border-color: ${({ theme }) => theme.colors.border.focus};
     box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
   `}
@@ -142,10 +142,10 @@ const PasswordToggle = styled.button`
   }
 `;
 
-const HelperText = styled.span<{ isError?: boolean }>`
+const HelperText = styled.span<{ $isError?: boolean }>`
   font-size: ${({ theme }) => theme.fonts.size.XS};
-  color: ${({ theme, isError }) => 
-    isError ? theme.colors.danger : theme.colors.text.tertiary};
+  color: ${({ theme, $isError }) => 
+    $isError ? theme.colors.danger : theme.colors.text.tertiary};
   line-height: 1.4;
 `;
 
@@ -174,10 +174,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   };
 
   return (
-    <InputContainer fullWidth={fullWidth}>
+    <InputContainer $fullWidth={fullWidth}>
       {label && <Label>{label}</Label>}
       
-      <InputWrapper hasError={hasError} isFocused={isFocused}>
+      <InputWrapper $hasError={hasError} $isFocused={isFocused}>
         {leftIcon && (
           <IconWrapper position="left">
             {leftIcon}
@@ -217,7 +217,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
       </InputWrapper>
       
       {displayHelperText && (
-        <HelperText isError={hasError}>
+        <HelperText $isError={hasError}>
           {displayHelperText}
         </HelperText>
       )}

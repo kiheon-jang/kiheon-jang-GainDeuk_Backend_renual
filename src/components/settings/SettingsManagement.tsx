@@ -52,7 +52,7 @@ const ActionsGrid = styled.div`
   gap: 1rem;
 `;
 
-const ActionButton = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' }>`
+const ActionButton = styled.button<{ $variant?: 'primary' | 'secondary' | 'danger' }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -64,8 +64,8 @@ const ActionButton = styled.button<{ variant?: 'primary' | 'secondary' | 'danger
   cursor: pointer;
   border: 2px solid transparent;
 
-  ${({ variant, theme }) => {
-    switch (variant) {
+  ${({ $variant, theme }) => {
+    switch ($variant) {
       case 'primary':
         return `
           background: ${theme.colors.primary};
@@ -173,7 +173,7 @@ const SettingsManagement: React.FC<SettingsManagementProps> = ({
       </SettingsHeader>
 
       <ActionsGrid>
-        <ActionButton variant="primary" onClick={onExport}>
+        <ActionButton $variant="primary" onClick={onExport}>
           <Download size={20} />
           설정 내보내기
         </ActionButton>
@@ -183,7 +183,7 @@ const SettingsManagement: React.FC<SettingsManagementProps> = ({
           설정 가져오기
         </ActionButton>
 
-        <ActionButton variant="danger" onClick={onReset}>
+        <ActionButton $variant="danger" onClick={onReset}>
           <RotateCcw size={20} />
           설정 초기화
         </ActionButton>

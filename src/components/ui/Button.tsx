@@ -5,11 +5,12 @@ import { touchFriendlyButton, disableHoverOnTouch, touchFocus } from '@/utils/to
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  $variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  fullWidth?: boolean;
+  $fullWidth?: boolean;
 }
 
 const ButtonBase = styled.button<ButtonProps>`
@@ -37,7 +38,7 @@ const ButtonBase = styled.button<ButtonProps>`
     opacity: 0.6;
   }
 
-  ${({ fullWidth }) => fullWidth && css`
+  ${({ $fullWidth }) => $fullWidth && css`
     width: 100%;
   `}
 
@@ -66,8 +67,8 @@ const ButtonBase = styled.button<ButtonProps>`
   }}
 
   /* Color variants */
-  ${({ variant = 'primary' }) => {
-    switch (variant) {
+  ${({ $variant = 'primary' }) => {
+    switch ($variant) {
       case 'secondary':
         return css`
           background: ${({ theme }) => theme.colors.gray[100]};
@@ -167,20 +168,23 @@ const LoadingSpinner = styled(Loader2)`
 const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
+  $variant,
   size = 'md',
   isLoading = false,
   leftIcon,
   rightIcon,
   disabled,
-  fullWidth = false,
+  $fullWidth = false,
   ...props
 }) => {
+  const effectiveVariant = $variant || variant;
+  
   return (
     <ButtonBase
-      variant={variant}
+      $variant={effectiveVariant}
       size={size}
       disabled={disabled || isLoading}
-      fullWidth={fullWidth}
+      $fullWidth={$fullWidth}
       {...props}
     >
       {isLoading ? (

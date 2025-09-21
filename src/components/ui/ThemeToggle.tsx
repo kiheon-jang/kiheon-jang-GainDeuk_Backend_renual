@@ -34,14 +34,14 @@ const ToggleButton = styled.button`
   }
 `;
 
-const IconWrapper = styled.div<{ isVisible: boolean }>`
+const IconWrapper = styled.div<{ $isVisible: boolean }>`
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: ${({ theme }) => theme.transitions.FAST};
-  opacity: ${({ isVisible }) => isVisible ? 1 : 0};
-  transform: ${({ isVisible }) => isVisible ? 'scale(1) rotate(0deg)' : 'scale(0.8) rotate(180deg)'};
+  opacity: ${({ $isVisible }) => $isVisible ? 1 : 0};
+  transform: ${({ $isVisible }) => $isVisible ? 'scale(1) rotate(0deg)' : 'scale(0.8) rotate(180deg)'};
 `;
 
 const ThemeToggle: React.FC = () => {
@@ -53,10 +53,10 @@ const ThemeToggle: React.FC = () => {
       aria-label={isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'}
       title={isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'}
     >
-      <IconWrapper isVisible={!isDarkMode}>
+      <IconWrapper $isVisible={!isDarkMode}>
         <Sun size={18} />
       </IconWrapper>
-      <IconWrapper isVisible={isDarkMode}>
+      <IconWrapper $isVisible={isDarkMode}>
         <Moon size={18} />
       </IconWrapper>
     </ToggleButton>

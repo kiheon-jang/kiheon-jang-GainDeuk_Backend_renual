@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { TrendingUp, TrendingDown, Clock, Target, Shield, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
-import type { TradingSignal } from '@/types';
+import type { ApiTradingSignal } from '@/types';
 import { formatPrice, getSignalColor, getSignalText, formatTimeRemaining } from '@/utils';
 import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
+import { optimizedMemo } from '@/utils/reactOptimization';
 
 interface TradingSignalCardProps {
-  signal: TradingSignal;
+  signal: ApiTradingSignal;
   onExecuteTrade?: (signalId: string, action: 'BUY' | 'SELL', amount: number, price: number) => void;
   isExecuting?: boolean;
 }
@@ -243,17 +244,17 @@ const ChecklistList = styled.div`
   gap: 0.5rem;
 `;
 
-const ChecklistItem = styled.div<{ completed?: boolean }>`
+const ChecklistItem = styled.div<{ $completed?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: ${({ completed, theme }) => completed ? `${theme.colors.secondary}15` : theme.colors.gray[50]};
+  background: ${({ $completed, theme }) => $completed ? `${theme.colors.secondary}15` : theme.colors.gray[50]};
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.SM};
-  color: ${({ completed, theme }) => completed ? theme.colors.secondary : theme.colors.gray[700]};
-  text-decoration: ${({ completed }) => completed ? 'line-through' : 'none'};
-  opacity: ${({ completed }) => completed ? 0.7 : 1};
+  color: ${({ $completed, theme }) => $completed ? theme.colors.secondary : theme.colors.gray[700]};
+  text-decoration: ${({ $completed }) => $completed ? 'line-through' : 'none'};
+  opacity: ${({ $completed }) => $completed ? 0.7 : 1};
 `;
 
 const ActionSection = styled.div`
@@ -262,16 +263,16 @@ const ActionSection = styled.div`
   align-items: center;
 `;
 
-const ExecuteButton = styled.button<{ signalType: 'BUY' | 'SELL'; disabled?: boolean }>`
+const ExecuteButton = styled.button<{ signalType: 'BUY' | 'SELL'; $disabled?: boolean }>`
   flex: 1;
-  background: ${({ signalType, disabled }) => disabled ? '#9CA3AF' : getSignalColor(signalType)};
+  background: ${({ signalType, $disabled }) => $disabled ? '#9CA3AF' : getSignalColor(signalType)};
   color: white;
   border: none;
   padding: 1rem 1.5rem;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.BASE};
   font-weight: 700;
-  cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
+  cursor: ${({ $disabled }) => $disabled ? 'not-allowed' : 'pointer'};
   transition: ${({ theme }) => theme.transitions.FAST};
   display: flex;
   align-items: center;
@@ -302,54 +303,69 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
   onExecuteTrade,
   isExecuting = false
 }) => {
-  const [timeRemaining, setTimeRemaining] = useState(formatTimeRemaining(signal.timeframe.validUntil));
-  const [checklistItems, setChecklistItems] = useState(signal.checklist);
+  const [timeRemaining, setTimeRemaining] = useState('24시간');
+  const [checklistItems, setChecklistItems] = useState([
+    { id: '1', text: '시장 상황 확인', completed: false },
+    { id: '2', text: '리스크 관리 계획 수립', completed: false },
+    { id: '3', text: '포지션 크기 결정', completed: false },
+    { id: '4', text: '손절가/목표가 설정', completed: false }
+  ]);
 
-  // 타이머 업데이트
+  // 타이머 업데이트 (ApiTradingSignal에는 validUntil이 없으므로 임시로 처리)
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeRemaining(formatTimeRemaining(signal.timeframe.validUntil));
+      // 임시로 24시간 고정
+      setTimeRemaining('24시간');
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [signal.timeframe.validUntil]);
+  }, []);
 
-  const handleExecuteTrade = () => {
-    if (onExecuteTrade && !isExecuting && signal.signal.action !== 'HOLD') {
+  // 메모이제이션된 핸들러들
+  const handleExecuteTrade = useCallback(() => {
+    if (onExecuteTrade && !isExecuting && signal.action !== 'HOLD') {
       onExecuteTrade(
         signal.id,
-        signal.signal.action as 'BUY' | 'SELL',
-        signal.targets.positionSize,
-        signal.targets.entryPrice
+        signal.action as 'BUY' | 'SELL',
+        100000, // 기본 금액 (ApiTradingSignal에는 targets가 없음)
+        signal.price
       );
     }
-  };
+  }, [onExecuteTrade, isExecuting, signal.id, signal.action, signal.price]);
 
-  const toggleChecklistItem = (id: string) => {
+  const toggleChecklistItem = useCallback((id: string) => {
     setChecklistItems(prev => 
       prev.map(item => 
         item.id === id ? { ...item, completed: !item.completed } : item
       )
     );
-  };
+  }, []);
 
-  const isExpired = timeRemaining === '만료됨';
-  const allChecklistCompleted = checklistItems.every(item => item.completed);
-  const isHoldSignal = signal.signal.action === 'HOLD';
+  // 메모이제이션된 계산값들
+  const isExpired = useMemo(() => timeRemaining === '만료됨', [timeRemaining]);
+  const allChecklistCompleted = useMemo(() => checklistItems.every(item => item.completed), [checklistItems]);
+  const isHoldSignal = useMemo(() => signal.action === 'HOLD', [signal.action]);
+  const signalType = useMemo(() => isHoldSignal ? 'BUY' : signal.action as 'BUY' | 'SELL', [isHoldSignal, signal.action]);
+  
+  // 메모이제이션된 포맷된 값들 (달러를 원화로 변환)
+  const formattedCoinPrice = useMemo(() => formatPrice(signal.price, true), [signal.price]);
+  const formattedStopLoss = useMemo(() => formatPrice(signal.price * 0.95, true), [signal.price]); // 임시로 5% 손절가
+  const formattedTargetPrice = useMemo(() => formatPrice(signal.price * 1.1, true), [signal.price]); // 임시로 10% 목표가
+  const formattedPositionSize = useMemo(() => formatPrice(100000, true), []); // 기본 포지션 크기 (10만원)
 
   return (
-    <Card signalType={isHoldSignal ? 'BUY' : signal.signal.action as 'BUY' | 'SELL'}>
+    <Card signalType={signalType}>
       <SignalHeader>
         <CoinInfo>
-          <CoinImage src={signal.coin.image} alt={signal.coin.name} />
+          <CoinImage src={`https://cryptologos.cc/logos/${signal.symbol.toLowerCase()}-${signal.symbol.toLowerCase()}-logo.png`} alt={signal.name} />
           <CoinDetails>
-            <CoinName>{signal.coin.name}</CoinName>
-            <CoinPrice>{formatPrice(signal.coin.currentPrice)}</CoinPrice>
+            <CoinName>{signal.name}</CoinName>
+            <CoinPrice>{formattedCoinPrice}</CoinPrice>
           </CoinDetails>
         </CoinInfo>
-        <SignalBadge signalType={isHoldSignal ? 'BUY' : signal.signal.action as 'BUY' | 'SELL'}>
-          {signal.signal.action === 'BUY' ? <TrendingUp size={20} /> : signal.signal.action === 'SELL' ? <TrendingDown size={20} /> : <Clock size={20} />}
-          {getSignalText(signal.signal.action)}
+        <SignalBadge signalType={signalType}>
+          {signal.action === 'BUY' ? <TrendingUp size={20} /> : signal.action === 'SELL' ? <TrendingDown size={20} /> : <Clock size={20} />}
+          {getSignalText(signal.action)}
         </SignalBadge>
       </SignalHeader>
 
@@ -361,7 +377,7 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
             </InfoIcon>
             <InfoContent>
               <InfoLabel>손절가</InfoLabel>
-              <InfoValue>{formatPrice(signal.targets.stopLoss)}</InfoValue>
+              <InfoValue>{formattedStopLoss}</InfoValue>
             </InfoContent>
           </InfoItem>
 
@@ -371,7 +387,7 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
             </InfoIcon>
             <InfoContent>
               <InfoLabel>목표가</InfoLabel>
-              <InfoValue>{formatPrice(signal.targets.targetPrice)}</InfoValue>
+              <InfoValue>{formattedTargetPrice}</InfoValue>
             </InfoContent>
           </InfoItem>
 
@@ -381,7 +397,7 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
             </InfoIcon>
             <InfoContent>
               <InfoLabel>포지션 크기</InfoLabel>
-              <InfoValue>{formatPrice(signal.targets.positionSize)}</InfoValue>
+              <InfoValue>{formattedPositionSize}</InfoValue>
             </InfoContent>
           </InfoItem>
         </TradingInfo>
@@ -394,9 +410,9 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
           <div>
             <InfoLabel>AI 신뢰도</InfoLabel>
             <ConfidenceBar>
-              <ConfidenceFill confidence={signal.signal.confidence} />
+              <ConfidenceFill confidence={parseInt(signal.confidence)} />
             </ConfidenceBar>
-            <InfoValue style={{ marginTop: '0.5rem' }}>{signal.signal.confidence}%</InfoValue>
+            <InfoValue style={{ marginTop: '0.5rem' }}>{signal.confidence}%</InfoValue>
           </div>
         </StrategyInfo>
       </SignalContent>
@@ -407,7 +423,12 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
           신호 근거
         </RationaleTitle>
         <RationaleList>
-          {[...signal.reasons.technical, ...signal.reasons.fundamental, ...signal.reasons.sentiment, ...signal.reasons.news].slice(0, 4).map((reason, index) => (
+          {[
+            `기술적 분석 점수: ${signal.score}`,
+            `신뢰도: ${signal.confidence}%`,
+            `우선순위: ${signal.priority}`,
+            `시간대: ${signal.timeframe}`
+          ].map((reason, index) => (
             <RationaleItem key={index}>
               💡 {reason}
             </RationaleItem>
@@ -424,7 +445,7 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
           {checklistItems.map((item) => (
             <ChecklistItem
               key={item.id}
-              completed={item.completed}
+              $completed={item.completed}
               onClick={() => toggleChecklistItem(item.id)}
               style={{ cursor: 'pointer' }}
             >
@@ -436,8 +457,8 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
 
       <ActionSection>
         <ExecuteButton
-          signalType={isHoldSignal ? 'BUY' : signal.signal.action as 'BUY' | 'SELL'}
-          disabled={isExecuting || isExpired || !allChecklistCompleted || isHoldSignal}
+          signalType={isHoldSignal ? 'BUY' : signal.action as 'BUY' | 'SELL'}
+          $disabled={isExecuting || isExpired || !allChecklistCompleted || isHoldSignal}
           onClick={handleExecuteTrade}
         >
           {isExecuting ? (
@@ -450,8 +471,8 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
             <>📋 체크리스트 완료 필요</>
           ) : (
             <>
-              {signal.signal.action === 'BUY' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-              {signal.signal.action === 'BUY' ? '매수 실행' : '매도 실행'}
+              {signal.action === 'BUY' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+              {signal.action === 'BUY' ? '매수 실행' : '매도 실행'}
             </>
           )}
         </ExecuteButton>
@@ -465,4 +486,8 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
   );
 };
 
-export default TradingSignalCard;
+// React.memo로 최적화된 컴포넌트 내보내기
+export default optimizedMemo(TradingSignalCard, {
+  displayName: 'TradingSignalCard',
+  deep: false // 얕은 비교 사용 (기본값)
+});

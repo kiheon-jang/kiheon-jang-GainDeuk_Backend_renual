@@ -13,20 +13,20 @@ const FilterContainer = styled.div`
   margin-bottom: 1.5rem;
 `;
 
-const FilterButton = styled.button<{ isActive: boolean }>`
+const FilterButton = styled.button<{ $isActive: boolean }>`
   padding: 0.5rem 1rem;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-size: ${({ theme }) => theme.fonts.size.SM};
   font-weight: 500;
   cursor: pointer;
   transition: ${({ theme }) => theme.transitions.FAST};
-  border: 1px solid ${({ isActive, theme }) => isActive ? theme.colors.primary : theme.colors.gray[200]};
-  background: ${({ isActive, theme }) => isActive ? theme.colors.primary : theme.colors.background.primary};
-  color: ${({ isActive, theme }) => isActive ? 'white' : theme.colors.gray[700]};
+  border: 1px solid ${({ $isActive, theme }) => $isActive ? theme.colors.primary : theme.colors.gray[200]};
+  background: ${({ $isActive, theme }) => $isActive ? theme.colors.primary : theme.colors.background.primary};
+  color: ${({ $isActive, theme }) => $isActive ? 'white' : theme.colors.gray[700]};
 
   &:hover {
-    background: ${({ isActive, theme }) => isActive ? theme.colors.primary + 'dd' : theme.colors.gray[50]};
-    border-color: ${({ isActive, theme }) => isActive ? theme.colors.primary + 'dd' : theme.colors.gray[300]};
+    background: ${({ $isActive, theme }) => $isActive ? theme.colors.primary + 'dd' : theme.colors.gray[50]};
+    border-color: ${({ $isActive, theme }) => $isActive ? theme.colors.primary + 'dd' : theme.colors.gray[300]};
   }
 `;
 
@@ -47,7 +47,7 @@ const StrategyFilter: React.FC<StrategyFilterProps> = ({
       {strategies.map((strategy) => (
         <FilterButton
           key={strategy.value}
-          isActive={selectedStrategy === strategy.value}
+          $isActive={selectedStrategy === strategy.value}
           onClick={() => onStrategyChange(strategy.value)}
         >
           {strategy.label}

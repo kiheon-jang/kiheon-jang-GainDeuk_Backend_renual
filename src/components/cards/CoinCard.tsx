@@ -10,13 +10,13 @@ interface CoinCardProps {
   onClick?: () => void;
 }
 
-const Card = styled.div<{ isRecommended?: boolean }>`
+const Card = styled.div<{ $isRecommended?: boolean }>`
   background: ${({ theme }) => theme.colors.background.primary};
   border-radius: ${({ theme }) => theme.borderRadius.LG};
   padding: 1.5rem;
   box-shadow: ${({ theme }) => theme.shadows.MD};
-  border: 2px solid ${({ theme, isRecommended }) => 
-    isRecommended ? theme.colors.primary : theme.colors.border.primary};
+  border: 2px solid ${({ theme, $isRecommended }) => 
+    $isRecommended ? theme.colors.primary : theme.colors.border.primary};
   cursor: pointer;
   transition: ${({ theme }) => theme.transitions.FAST};
   position: relative;
@@ -24,8 +24,8 @@ const Card = styled.div<{ isRecommended?: boolean }>`
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${({ theme }) => theme.shadows.LG};
-    border-color: ${({ theme, isRecommended }) => 
-      isRecommended ? theme.colors.primary : theme.colors.border.secondary};
+    border-color: ${({ theme, $isRecommended }) => 
+      $isRecommended ? theme.colors.primary : theme.colors.border.secondary};
   }
 `;
 
@@ -98,15 +98,15 @@ const CurrentPrice = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const ChangeContainer = styled.div<{ isPositive: boolean }>`
+const ChangeContainer = styled.div<{ $isPositive: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: ${({ theme, isPositive }) => 
-    isPositive ? theme.colors.success : theme.colors.danger};
+  color: ${({ theme, $isPositive }) => 
+    $isPositive ? theme.colors.success : theme.colors.danger};
 `;
 
-const ChangeIcon = styled.div<{ isPositive: boolean }>`
+const ChangeIcon = styled.div<{ $isPositive: boolean }>`
   display: flex;
   align-items: center;
 `;
@@ -135,11 +135,11 @@ const Volume = styled.div`
 `;
 
 const CoinCard: React.FC<CoinCardProps> = ({ coin, isRecommended = false, onClick }) => {
-  const isPositive = coin.change24h >= 0;
+  const isPositive = (coin.change24h ?? 0) >= 0;
   const ChangeIconComponent = isPositive ? TrendingUp : TrendingDown;
 
   return (
-    <Card isRecommended={isRecommended} onClick={onClick}>
+    <Card $isRecommended={isRecommended} onClick={onClick}>
       {isRecommended && (
         <RecommendedBadge>
           <Star size={12} />
@@ -166,9 +166,9 @@ const CoinCard: React.FC<CoinCardProps> = ({ coin, isRecommended = false, onClic
       </CoinHeader>
 
       <PriceSection>
-        <CurrentPrice>{formatPrice(coin.currentPrice)}</CurrentPrice>
-        <ChangeContainer isPositive={isPositive}>
-          <ChangeIcon isPositive={isPositive}>
+        <CurrentPrice>{formatPrice(coin.currentPrice, true)}</CurrentPrice>
+        <ChangeContainer $isPositive={isPositive}>
+          <ChangeIcon $isPositive={isPositive}>
             <ChangeIconComponent size={16} />
           </ChangeIcon>
           <ChangeText>{formatPercentage(coin.change24h)}</ChangeText>
@@ -178,12 +178,12 @@ const CoinCard: React.FC<CoinCardProps> = ({ coin, isRecommended = false, onClic
       <MarketInfo>
         {coin.marketCap && (
           <MarketCap>
-            시가총액: {formatPrice(coin.marketCap)}
+            시가총액: {formatPrice(coin.marketCap, true)}
           </MarketCap>
         )}
         {coin.volume && (
           <Volume>
-            거래량: {formatPrice(coin.volume)}
+            거래량: {formatPrice(coin.volume, true)}
           </Volume>
         )}
       </MarketInfo>

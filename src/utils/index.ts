@@ -1,14 +1,49 @@
+// 달러-원화 환율 (실제로는 API에서 가져와야 하지만, 임시로 고정값 사용)
+let USD_TO_KRW_RATE = 1395; // 1 USD = 1395 KRW (실제 환율 기준)
+
+// 환율 업데이트 함수 (실제 API 연동)
+export const updateExchangeRate = async (): Promise<void> => {
+  try {
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const data = await response.json();
+    
+    if (data.rates && data.rates.KRW) {
+      USD_TO_KRW_RATE = data.rates.KRW;
+      console.log('✅ 환율 업데이트 완료: 1 USD =', USD_TO_KRW_RATE.toFixed(2), 'KRW');
+    } else {
+      console.warn('⚠️ 환율 데이터를 찾을 수 없습니다. 기본값 사용:', USD_TO_KRW_RATE);
+    }
+  } catch (error) {
+    console.error('❌ 환율 업데이트 실패:', error);
+    console.log('기본 환율 사용:', USD_TO_KRW_RATE);
+  }
+};
+
+// 달러를 원화로 변환
+export const convertUsdToKrw = (usdPrice: number): number => {
+  return usdPrice * USD_TO_KRW_RATE;
+};
+
+// 현재 환율 반환
+export const getCurrentExchangeRate = (): number => {
+  return USD_TO_KRW_RATE;
+};
+
 // 숫자 포맷팅 유틸리티
-export const formatPrice = (price: number): string => {
+export const formatPrice = (price: number, isUsd: boolean = true): string => {
+  const finalPrice = isUsd ? convertUsdToKrw(price) : price;
   return new Intl.NumberFormat('ko-KR', {
     style: 'currency',
     currency: 'KRW',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(price);
+  }).format(finalPrice);
 };
 
-export const formatPercentage = (value: number): string => {
+export const formatPercentage = (value: number | undefined): string => {
+  if (value === undefined || value === null || isNaN(value)) {
+    return '0.00%';
+  }
   const sign = value > 0 ? '+' : '';
   return `${sign}${value.toFixed(2)}%`;
 };

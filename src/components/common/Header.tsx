@@ -30,7 +30,7 @@ const Logo = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  ${responsiveTypography.h2}
+  ${responsiveTypography('lg', 'bold')}
   font-weight: 700;
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
@@ -67,14 +67,14 @@ const Navigation = styled.nav`
   `}
 `;
 
-const NavItem = styled.a<{ active?: boolean }>`
+const NavItem = styled.a<{ $active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
-  color: ${({ theme, active }) => active ? theme.colors.primary : theme.colors.text.secondary};
-  background: ${({ theme, active }) => active ? theme.colors.gray[50] : 'transparent'};
+  color: ${({ theme, $active }) => $active ? theme.colors.primary : theme.colors.text.secondary};
+  background: ${({ theme, $active }) => $active ? theme.colors.gray[50] : 'transparent'};
   text-decoration: none;
   font-weight: 500;
   transition: ${({ theme }) => theme.transitions.FAST};

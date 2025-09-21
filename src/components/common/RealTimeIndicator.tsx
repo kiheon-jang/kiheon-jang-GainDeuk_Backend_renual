@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { Wifi, WifiOff, RefreshCw, Clock } from 'lucide-react';
 
 interface RealTimeIndicatorProps {
@@ -32,28 +32,28 @@ const IndicatorContainer = styled.div`
   font-size: ${({ theme }) => theme.fonts.size.SM};
 `;
 
-const StatusIcon = styled.div<{ isOnline: boolean; isRefreshing: boolean }>`
+const StatusIcon = styled.div<{ $isOnline: boolean; $isRefreshing: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
   border-radius: ${({ theme }) => theme.borderRadius.FULL};
-  background: ${({ isOnline, theme }) => 
-    isOnline ? theme.colors.success : theme.colors.danger};
+  background: ${({ $isOnline, theme }) => 
+    $isOnline ? theme.colors.success : theme.colors.danger};
   color: white;
-  animation: ${({ isRefreshing }) => isRefreshing ? spin : 'none'} 1s linear infinite;
+  animation: ${({ $isRefreshing }) => $isRefreshing ? spin : 'none'} 1s linear infinite;
   
-  ${({ isOnline, isRefreshing }) => 
-    isOnline && !isRefreshing && `
+  ${({ $isOnline, $isRefreshing }) => 
+    $isOnline && !$isRefreshing && css`
       animation: ${pulse} 2s ease-in-out infinite;
     `
   }
 `;
 
-const StatusText = styled.span<{ isOnline: boolean }>`
-  color: ${({ isOnline, theme }) => 
-    isOnline ? theme.colors.text.primary : theme.colors.danger};
+const StatusText = styled.span<{ $isOnline: boolean }>`
+  color: ${({ $isOnline, theme }) => 
+    $isOnline ? theme.colors.text.primary : theme.colors.danger};
   font-weight: 500;
 `;
 
@@ -140,7 +140,7 @@ const RealTimeIndicator: React.FC<RealTimeIndicatorProps> = ({
 
   return (
     <IndicatorContainer>
-      <StatusIcon isOnline={isOnline} isRefreshing={isRefreshing}>
+      <StatusIcon $isOnline={isOnline} $isRefreshing={isRefreshing}>
         {isRefreshing ? (
           <RefreshCw size={12} />
         ) : isOnline ? (
@@ -150,7 +150,7 @@ const RealTimeIndicator: React.FC<RealTimeIndicatorProps> = ({
         )}
       </StatusIcon>
       
-      <StatusText isOnline={isOnline}>
+      <StatusText $isOnline={isOnline}>
         {isRefreshing ? '업데이트 중...' : isOnline ? '실시간 연결됨' : '오프라인'}
       </StatusText>
       

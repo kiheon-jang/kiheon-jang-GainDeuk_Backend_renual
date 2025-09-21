@@ -37,6 +37,7 @@ export interface AppSettings {
   refreshInterval: number; // seconds
   showAdvancedFeatures: boolean;
   debugMode: boolean;
+  performanceMonitoring: boolean;
 }
 
 export interface UserSettings {
@@ -82,6 +83,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
     refreshInterval: 30,
     showAdvancedFeatures: false,
     debugMode: false,
+    performanceMonitoring: false,
   },
 };
 

@@ -100,7 +100,7 @@ const CoinList: React.FC = () => {
 
   // AI 추천 코인 ID 목록
   const recommendedCoinIds = useMemo(() => 
-    recommendations.map(rec => rec.coin.id), 
+    recommendations.map(rec => rec.coinId), 
     [recommendations]
   );
 

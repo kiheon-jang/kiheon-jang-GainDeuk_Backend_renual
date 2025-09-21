@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, Clock, Target, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, Clock, Target, DollarSign, CheckCircle } from 'lucide-react';
 import type { ApiTradingSignal } from '@/types';
 import { getCoinIcon, getCoinColor } from '@/utils/imageUtils';
 import { formatPrice, getSignalColor, getSignalText } from '@/utils';

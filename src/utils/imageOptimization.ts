@@ -1,5 +1,6 @@
 /**
  * 이미지 최적화 유틸리티
+ * 외부 이미지 로딩 문제를 해결하기 위해 아이콘 기반 시스템으로 변경
  * WebP, AVIF 등 차세대 이미지 포맷 지원 및 반응형 이미지 처리
  */
 
@@ -96,6 +97,11 @@ export const generateOptimizedImageUrl = (
     blur?: number;
   } = {}
 ): string => {
+  // 외부 이미지 URL인 경우 아이콘 기반 시스템으로 대체
+  if (originalUrl.includes('cryptologos.cc') || originalUrl.includes('http')) {
+    return 'icon-based'; // 아이콘 사용을 나타내는 플래그
+  }
+  
   const { width, height, format, quality, blur } = options;
   
   // CDN 또는 이미지 최적화 서비스 URL 생성

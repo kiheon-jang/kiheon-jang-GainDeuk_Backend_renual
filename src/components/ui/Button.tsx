@@ -6,7 +6,7 @@ import { touchFriendlyButton, disableHoverOnTouch, touchFocus } from '@/utils/to
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
   $variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  $size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -43,8 +43,8 @@ const ButtonBase = styled.button<ButtonProps>`
   `}
 
   /* Size variants */
-  ${({ size = 'md' }) => {
-    switch (size) {
+  ${({ $size = 'md' }) => {
+    switch ($size) {
       case 'sm':
         return css`
           padding: 0.5rem 0.75rem;
@@ -169,7 +169,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
   $variant,
-  size = 'md',
+  $size = 'md',
   isLoading = false,
   leftIcon,
   rightIcon,
@@ -182,7 +182,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <ButtonBase
       $variant={effectiveVariant}
-      size={size}
+      $size={$size}
       disabled={disabled || isLoading}
       $fullWidth={$fullWidth}
       {...props}

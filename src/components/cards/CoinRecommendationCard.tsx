@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { CoinRecommendation } from '@/types';
 import { getRiskColor, getRiskIcon, formatPrice, formatPercentage } from '@/utils';
+import { getCoinIcon, getCoinColor } from '@/utils/imageUtils';
 import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
 import { optimizedMemo } from '@/utils/reactOptimization';
 
@@ -83,15 +84,36 @@ const CoinHeader = styled.div`
   `}
 `;
 
-const CoinImage = styled.img`
+const CoinIconContainer = styled.div<{ $color: string }>`
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  object-fit: cover;
+  background: linear-gradient(135deg, ${({ $color }) => $color}20, ${({ $color }) => $color}40);
+  border: 2px solid ${({ $color }) => $color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: ${({ theme }) => theme.transitions.FAST};
   
   ${media.max.sm`
     width: 2.5rem;
     height: 2.5rem;
+  `}
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px ${({ $color }) => $color}40;
+  }
+`;
+
+const CoinIconText = styled.span`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.text.primary};
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  
+  ${media.max.sm`
+    font-size: 1.25rem;
   `}
 `;
 
@@ -363,7 +385,9 @@ const CoinRecommendationCard: React.FC<CoinRecommendationCardProps> = ({
       </AIIcon>
       
       <CoinHeader>
-        <CoinImage src={coin.image} alt={coin.name} />
+        <CoinIconContainer $color={getCoinColor(coin.symbol)}>
+          <CoinIconText>{getCoinIcon(coin.symbol)}</CoinIconText>
+        </CoinIconContainer>
         <CoinInfo>
           <CoinName>{coin.name}</CoinName>
           <CoinSymbol>{coin.symbol}</CoinSymbol>

@@ -186,14 +186,23 @@ class PreloadManager {
   }
 
   /**
-   * API 엔드포인트 프리로딩
+   * API 엔드포인트 프리로딩 (조건부)
    */
-  async preloadFetch(href: string, priority: 'high' | 'medium' | 'low' = 'low'): Promise<boolean> {
-    return this.preloadResource({
-      href,
-      options: { as: 'fetch', crossorigin: 'anonymous' },
-      priority
-    });
+  async preloadFetch(href: string, _priority: 'high' | 'medium' | 'low' = 'low'): Promise<boolean> {
+    // 이미 로드되었거나 로딩 중인 경우 스킵
+    if (this.state.loaded.has(href) || this.state.loading.has(href)) {
+      return this.state.loaded.has(href);
+    }
+
+    // fetch preload는 실제 요청과 동시에 발생해야 하므로
+    // 단순히 리소스 상태만 기록하고 실제 fetch는 API 호출 시점에 수행
+    this.state.loaded.add(href);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📡 API endpoint marked for preload: ${href}`);
+    }
+    
+    return true;
   }
 
   /**
@@ -328,29 +337,22 @@ class PreloadManager {
 export const preloadManager = new PreloadManager();
 
 /**
- * 중요 리소스 자동 프리로딩
+ * 중요 리소스 자동 프리로딩 (조건부)
  */
 export const preloadCriticalResources = async (): Promise<void> => {
+  // 실제로 존재하고 즉시 사용될 리소스만 preload
   const criticalResources: PreloadResource[] = [
-    // 중요 폰트 (실제 존재하는 파일만)
-    {
-      href: '/fonts/noto-sans-kr.woff2',
-      options: { as: 'font', type: 'font/woff2', crossorigin: 'anonymous' },
-      priority: 'high'
-    },
-    // 중요 API 엔드포인트
-    {
-      href: '/api/coins',
-      options: { as: 'fetch', crossorigin: 'anonymous' },
-      priority: 'medium'
-    }
+    // 폰트는 CSS에서 자동으로 로드되므로 preload 제거
+    // API는 실제 호출 시점에 preload하도록 변경
   ];
 
   try {
-    const { loaded, failed } = await preloadManager.preloadResources(criticalResources);
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🚀 Critical resources preloaded:', { loaded, failed });
+    if (criticalResources.length > 0) {
+      const { loaded, failed } = await preloadManager.preloadResources(criticalResources);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🚀 Critical resources preloaded:', { loaded, failed });
+      }
     }
   } catch (error) {
     console.warn('⚠️ Failed to preload critical resources:', error);
@@ -358,58 +360,47 @@ export const preloadCriticalResources = async (): Promise<void> => {
 };
 
 /**
- * 페이지별 리소스 프리로딩
+ * 페이지별 리소스 프리로딩 (조건부)
  */
 export const preloadPageResources = (pageName: string): PreloadResource[] => {
   const pageResources: Record<string, PreloadResource[]> = {
     dashboard: [
-      {
-        href: '/api/dashboard',
-        options: { as: 'fetch', crossorigin: 'anonymous' },
-        priority: 'high'
-      },
-      {
-        href: '/images/dashboard-bg.webp',
-        options: { as: 'image' },
-        priority: 'medium'
-      }
+      // 대시보드는 즉시 로드되므로 API preload 제거
     ],
     trading: [
-      {
-        href: '/api/trading-signals',
-        options: { as: 'fetch', crossorigin: 'anonymous' },
-        priority: 'high'
-      },
-      {
-        href: '/images/trading-chart.webp',
-        options: { as: 'image' },
-        priority: 'medium'
-      }
+      // 매매 페이지는 실제 사용 시점에 preload
     ],
     profile: [
-      {
-        href: '/api/user-profile',
-        options: { as: 'fetch', crossorigin: 'anonymous' },
-        priority: 'high'
-      }
+      // 프로필 페이지는 실제 사용 시점에 preload
     ],
     coins: [
-      {
-        href: '/api/coins',
-        options: { as: 'fetch', crossorigin: 'anonymous' },
-        priority: 'high'
-      }
+      // 코인 목록은 실제 사용 시점에 preload
     ],
     settings: [
-      {
-        href: '/api/settings',
-        options: { as: 'fetch', crossorigin: 'anonymous' },
-        priority: 'medium'
-      }
+      // 설정 페이지는 실제 사용 시점에 preload
     ]
   };
 
   return pageResources[pageName] || [];
+};
+
+/**
+ * 페이지 진입 시 필요한 리소스만 preload
+ */
+export const preloadOnPageEnter = async (pageName: string): Promise<void> => {
+  const resources = preloadPageResources(pageName);
+  
+  if (resources.length > 0) {
+    try {
+      const { loaded, failed } = await preloadManager.preloadResources(resources);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🚀 ${pageName} page resources preloaded:`, { loaded, failed });
+      }
+    } catch (error) {
+      console.warn(`⚠️ Failed to preload ${pageName} page resources:`, error);
+    }
+  }
 };
 
 /**

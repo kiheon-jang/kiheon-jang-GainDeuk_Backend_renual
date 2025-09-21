@@ -10,8 +10,8 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   variant?: 'default' | 'filled';
-  size?: 'sm' | 'md' | 'lg';
-  fullWidth?: boolean;
+  $size?: 'sm' | 'md' | 'lg';
+  $fullWidth?: boolean;
 }
 
 const InputContainer = styled.div<{ $fullWidth?: boolean }>`
@@ -54,7 +54,7 @@ const InputWrapper = styled.div<{ $hasError?: boolean; $isFocused?: boolean }>`
 const InputField = styled.input<{ 
   hasLeftIcon?: boolean; 
   hasRightIcon?: boolean; 
-  size?: 'sm' | 'md' | 'lg';
+  $size?: 'sm' | 'md' | 'lg';
 }>`
   flex: 1;
   border: none;
@@ -78,8 +78,8 @@ const InputField = styled.input<{
   }
 
   /* Size variants */
-  ${({ size = 'md' }) => {
-    switch (size) {
+  ${({ $size = 'md' }) => {
+    switch ($size) {
       case 'sm':
         return css`
           padding: 0.5rem 0.75rem;
@@ -99,12 +99,12 @@ const InputField = styled.input<{
   }}
 
   /* Icon spacing */
-  ${({ hasLeftIcon, size = 'md' }) => hasLeftIcon && css`
-    padding-left: ${size === 'sm' ? '2rem' : size === 'lg' ? '3rem' : '2.5rem'};
+  ${({ hasLeftIcon, $size = 'md' }) => hasLeftIcon && css`
+    padding-left: ${$size === 'sm' ? '2rem' : $size === 'lg' ? '3rem' : '2.5rem'};
   `}
 
-  ${({ hasRightIcon, size = 'md' }) => hasRightIcon && css`
-    padding-right: ${size === 'sm' ? '2rem' : size === 'lg' ? '3rem' : '2.5rem'};
+  ${({ hasRightIcon, $size = 'md' }) => hasRightIcon && css`
+    padding-right: ${$size === 'sm' ? '2rem' : $size === 'lg' ? '3rem' : '2.5rem'};
   `}
 `;
 
@@ -156,8 +156,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   leftIcon,
   rightIcon,
   variant = 'default',
-  size = 'md',
-  fullWidth = false,
+  $size = 'md',
+  $fullWidth = false,
   type = 'text',
   ...props
 }, ref) => {
@@ -174,7 +174,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   };
 
   return (
-    <InputContainer $fullWidth={fullWidth}>
+    <InputContainer $fullWidth={$fullWidth}>
       {label && <Label>{label}</Label>}
       
       <InputWrapper $hasError={hasError} $isFocused={isFocused}>
@@ -189,7 +189,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
           type={inputType}
           hasLeftIcon={!!leftIcon}
           hasRightIcon={!!rightIcon || isPassword}
-          size={size}
+          $size={$size}
           onFocus={(e) => {
             setIsFocused(true);
             props.onFocus?.(e);

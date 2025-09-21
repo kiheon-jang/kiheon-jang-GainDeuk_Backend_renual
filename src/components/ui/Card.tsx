@@ -6,7 +6,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   padding?: 'none' | 'sm' | 'md' | 'lg';
   hover?: boolean;
   clickable?: boolean;
-  fullWidth?: boolean;
+  $fullWidth?: boolean;
 }
 
 const CardBase = styled.div<CardProps>`
@@ -16,7 +16,7 @@ const CardBase = styled.div<CardProps>`
   position: relative;
   overflow: hidden;
 
-  ${({ fullWidth }) => fullWidth && css`
+  ${({ $fullWidth }) => $fullWidth && css`
     width: 100%;
   `}
 
@@ -137,7 +137,7 @@ const Card: React.FC<CardProps> = ({
   padding = 'md',
   hover = false,
   clickable = false,
-  fullWidth = false,
+  $fullWidth = false,
   ...props
 }) => {
   return (
@@ -146,7 +146,7 @@ const Card: React.FC<CardProps> = ({
       padding={padding}
       hover={hover}
       clickable={clickable}
-      fullWidth={fullWidth}
+      $fullWidth={$fullWidth}
       {...props}
     >
       {children}

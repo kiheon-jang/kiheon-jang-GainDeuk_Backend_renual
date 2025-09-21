@@ -369,7 +369,7 @@ const PerformanceSettings: React.FC = () => {
           </SettingLabel>
           <ActionButton 
             variant="outline" 
-            size="sm"
+            $size="sm"
             onClick={handleClearCache}
             disabled={cacheSize === 0}
           >
@@ -424,7 +424,7 @@ const PerformanceSettings: React.FC = () => {
             {notificationPermission !== 'granted' && (
               <ActionButton 
                 variant="outline" 
-                size="sm"
+                $size="sm"
                 onClick={handleRequestNotificationPermission}
               >
                 <Bell size={14} />
@@ -435,7 +435,7 @@ const PerformanceSettings: React.FC = () => {
             {notificationPermission === 'granted' && (
               <ActionButton 
                 variant="outline" 
-                size="sm"
+                $size="sm"
                 onClick={handleSendTestNotification}
               >
                 <Bell size={14} />

@@ -8,7 +8,7 @@ import PerformanceMonitor from '@/components/common/PerformanceMonitor';
 import PerformanceDashboard from '@/components/common/PerformanceDashboard';
 import { initPerformanceMonitoring } from '@/utils/performance';
 import { registerServiceWorker } from '@/utils/serviceWorker';
-import { preloadCriticalResources } from '@/utils/preloading';
+// import { preloadCriticalResources } from '@/utils/preloading'; // 불필요한 preload 제거
 import { handleOfflineMode, scheduleCacheInvalidation } from '@/utils/caching';
 import { updateExchangeRate } from '@/utils';
 
@@ -36,11 +36,11 @@ const PageLoadingFallback: React.FC = () => (
 );
 
 const App: React.FC = () => {
-  // 성능 모니터링, 서비스 워커, 프리로딩, 캐싱 전략, 환율 초기화
+  // 성능 모니터링, 서비스 워커, 캐싱 전략, 환율 초기화
   useEffect(() => {
     initPerformanceMonitoring();
     registerServiceWorker();
-    preloadCriticalResources();
+    // preloadCriticalResources(); // 불필요한 preload 제거
     handleOfflineMode();
     scheduleCacheInvalidation();
     updateExchangeRate(); // 환율 업데이트

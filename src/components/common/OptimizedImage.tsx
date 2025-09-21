@@ -14,10 +14,9 @@ import {
   generateBlurPlaceholder,
   getSupportedFormats,
   type ImageFormat,
-  type ResponsiveBreakpoint,
-  type ImageOptimizationOptions
+  type ResponsiveBreakpoint
 } from '@/utils/imageOptimization';
-import { media } from '@/utils/responsive';
+import { getCoinIcon, getCoinColor } from '@/utils/imageUtils';
 
 interface OptimizedImageProps {
   src: string;
@@ -36,6 +35,7 @@ interface OptimizedImageProps {
   onError?: () => void;
   priority?: boolean;
   sizes?: string;
+  symbol?: string; // 암호화폐 심볼 (아이콘 기반 시스템용)
 }
 
 const ImageContainer = styled.div<{ 
@@ -165,6 +165,24 @@ const LoadingSpinner = styled.div`
   }
 `;
 
+const IconContainer = styled.div<{ $color: string }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: ${({ $color }) => $color}20;
+  border-radius: 50%;
+  border: 2px solid ${({ $color }) => $color}40;
+`;
+
+const IconText = styled.span`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.text.primary};
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+`;
+
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   alt,
@@ -181,7 +199,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   onLoad,
   onError,
   priority = false,
-  sizes = '100vw'
+  sizes = '100vw',
+  symbol
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -205,6 +224,13 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     format: primaryFormat,
     quality
   });
+
+  // 아이콘 기반 시스템 사용 여부 확인
+  const useIconSystem = optimizedSrc === 'icon-based' || src.includes('cryptologos.cc');
+  
+  // 아이콘 정보 가져오기
+  const coinIcon = symbol ? getCoinIcon(symbol) : '₿';
+  const coinColor = symbol ? getCoinColor(symbol) : '#6B7280';
 
   // srcset 생성
   const srcSet = generateSrcSet(src, breakpoints, availableFormats);
@@ -265,6 +291,23 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
         .catch(handleError);
     }
   }, [isInView, isLoaded, hasError, optimizedSrc, handleError]);
+
+  // 아이콘 기반 시스템 렌더링
+  if (useIconSystem) {
+    return (
+      <ImageContainer
+        ref={containerRef}
+        aspectRatio={aspectRatio}
+        width={width}
+        height={height}
+        className={className}
+      >
+        <IconContainer $color={coinColor}>
+          <IconText>{coinIcon}</IconText>
+        </IconContainer>
+      </ImageContainer>
+    );
+  }
 
   // 에러 상태 렌더링
   if (hasError) {

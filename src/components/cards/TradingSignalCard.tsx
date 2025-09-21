@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { TrendingUp, TrendingDown, Clock, Target, Shield, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
 import type { ApiTradingSignal } from '@/types';
-import { formatPrice, getSignalColor, getSignalText, formatTimeRemaining } from '@/utils';
-import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
-import { optimizedMemo } from '@/utils/reactOptimization';
+import { getCoinIcon, getCoinColor } from '@/utils/imageUtils';
+import { formatPrice, getSignalColor, getSignalText } from '@/utils';
+import { media } from '@/utils/responsive';
+import { optimizedMemo } from '../../utils/reactOptimization';
 
 interface TradingSignalCardProps {
   signal: ApiTradingSignal;
@@ -23,12 +24,12 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-const Card = styled.div<{ signalType: 'BUY' | 'SELL' }>`
+const Card = styled.div<{ $signalType: 'BUY' | 'SELL' }>`
   background: ${({ theme }) => theme.colors.background.primary};
   border-radius: ${({ theme }) => theme.borderRadius.LG};
   box-shadow: ${({ theme }) => theme.shadows.LG};
   padding: 1.5rem;
-  border: 2px solid ${({ signalType }) => getSignalColor(signalType)}40;
+  border: 2px solid ${({ $signalType }) => getSignalColor($signalType)}40;
   position: relative;
   overflow: hidden;
   animation: ${fadeIn} 0.3s ease-out;
@@ -50,7 +51,7 @@ const Card = styled.div<{ signalType: 'BUY' | 'SELL' }>`
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, ${({ signalType }) => getSignalColor(signalType)}, ${({ signalType }) => getSignalColor(signalType)}80);
+    background: linear-gradient(90deg, ${({ $signalType }) => getSignalColor($signalType)}, ${({ $signalType }) => getSignalColor($signalType)}80);
   }
 `;
 
@@ -67,11 +68,28 @@ const CoinInfo = styled.div`
   gap: 1rem;
 `;
 
-const CoinImage = styled.img`
+const CoinIconContainer = styled.div<{ $color: string }>`
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
-  object-fit: cover;
+  background: linear-gradient(135deg, ${({ $color }) => $color}20, ${({ $color }) => $color}40);
+  border: 2px solid ${({ $color }) => $color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: ${({ theme }) => theme.transitions.FAST};
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px ${({ $color }) => $color}40;
+  }
+`;
+
+const CoinIconText = styled.span`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.text.primary};
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 `;
 
 const CoinDetails = styled.div`
@@ -91,12 +109,12 @@ const CoinPrice = styled.div`
   color: ${({ theme }) => theme.colors.gray[600]};
 `;
 
-const SignalBadge = styled.div<{ signalType: 'BUY' | 'SELL' }>`
+const SignalBadge = styled.div<{ $signalType: 'BUY' | 'SELL' }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: ${({ signalType }) => getSignalColor(signalType)}15;
-  color: ${({ signalType }) => getSignalColor(signalType)};
+  background: ${({ $signalType }) => getSignalColor($signalType)}15;
+  color: ${({ $signalType }) => getSignalColor($signalType)};
   padding: 0.75rem 1rem;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   font-weight: 700;
@@ -185,10 +203,10 @@ const ConfidenceBar = styled.div`
   overflow: hidden;
 `;
 
-const ConfidenceFill = styled.div<{ confidence: number }>`
+const ConfidenceFill = styled.div<{ $confidence: number }>`
   height: 100%;
   background: linear-gradient(90deg, ${({ theme }) => theme.colors.danger}, ${({ theme }) => theme.colors.warning}, ${({ theme }) => theme.colors.secondary});
-  width: ${({ confidence }) => confidence}%;
+  width: ${({ $confidence }) => $confidence}%;
   transition: width 0.3s ease;
 `;
 
@@ -263,9 +281,9 @@ const ActionSection = styled.div`
   align-items: center;
 `;
 
-const ExecuteButton = styled.button<{ signalType: 'BUY' | 'SELL'; $disabled?: boolean }>`
+const ExecuteButton = styled.button<{ $signalType: 'BUY' | 'SELL'; $disabled?: boolean }>`
   flex: 1;
-  background: ${({ signalType, $disabled }) => $disabled ? '#9CA3AF' : getSignalColor(signalType)};
+  background: ${({ $signalType, $disabled }) => $disabled ? '#9CA3AF' : getSignalColor($signalType)};
   color: white;
   border: none;
   padding: 1rem 1.5rem;
@@ -280,7 +298,7 @@ const ExecuteButton = styled.button<{ signalType: 'BUY' | 'SELL'; $disabled?: bo
   gap: 0.5rem;
 
   &:hover:not(:disabled) {
-    background: ${({ signalType }) => getSignalColor(signalType)}dd;
+    background: ${({ $signalType }) => getSignalColor($signalType)}dd;
     transform: translateY(-1px);
   }
 
@@ -310,6 +328,10 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
     { id: '3', text: '포지션 크기 결정', completed: false },
     { id: '4', text: '손절가/목표가 설정', completed: false }
   ]);
+
+  // 아이콘과 색상 정보
+  const coinIcon = getCoinIcon(signal.symbol);
+  const coinColor = getCoinColor(signal.symbol);
 
   // 타이머 업데이트 (ApiTradingSignal에는 validUntil이 없으므로 임시로 처리)
   useEffect(() => {
@@ -352,18 +374,26 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
   const formattedStopLoss = useMemo(() => formatPrice(signal.price * 0.95, true), [signal.price]); // 임시로 5% 손절가
   const formattedTargetPrice = useMemo(() => formatPrice(signal.price * 1.1, true), [signal.price]); // 임시로 10% 목표가
   const formattedPositionSize = useMemo(() => formatPrice(100000, true), []); // 기본 포지션 크기 (10만원)
+  
+  // 신뢰도 값 안전하게 파싱 (NaN 방지)
+  const confidenceValue = useMemo(() => {
+    const parsed = parseInt(signal.confidence, 10);
+    return isNaN(parsed) ? 0 : Math.max(0, Math.min(100, parsed)); // 0-100 범위로 제한
+  }, [signal.confidence]);
 
   return (
-    <Card signalType={signalType}>
+    <Card $signalType={signalType}>
       <SignalHeader>
         <CoinInfo>
-          <CoinImage src={`https://cryptologos.cc/logos/${signal.symbol.toLowerCase()}-${signal.symbol.toLowerCase()}-logo.png`} alt={signal.name} />
+          <CoinIconContainer $color={coinColor}>
+            <CoinIconText>{coinIcon}</CoinIconText>
+          </CoinIconContainer>
           <CoinDetails>
             <CoinName>{signal.name}</CoinName>
             <CoinPrice>{formattedCoinPrice}</CoinPrice>
           </CoinDetails>
         </CoinInfo>
-        <SignalBadge signalType={signalType}>
+        <SignalBadge $signalType={signalType}>
           {signal.action === 'BUY' ? <TrendingUp size={20} /> : signal.action === 'SELL' ? <TrendingDown size={20} /> : <Clock size={20} />}
           {getSignalText(signal.action)}
         </SignalBadge>
@@ -404,15 +434,15 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
 
         <StrategyInfo>
           <StrategyBadge>
-            📊 {signal.timeframe.strategy}
+            📊 {signal.timeframe}
           </StrategyBadge>
           
           <div>
             <InfoLabel>AI 신뢰도</InfoLabel>
             <ConfidenceBar>
-              <ConfidenceFill confidence={parseInt(signal.confidence)} />
+              <ConfidenceFill $confidence={confidenceValue} />
             </ConfidenceBar>
-            <InfoValue style={{ marginTop: '0.5rem' }}>{signal.confidence}%</InfoValue>
+            <InfoValue style={{ marginTop: '0.5rem' }}>{confidenceValue}%</InfoValue>
           </div>
         </StrategyInfo>
       </SignalContent>
@@ -425,7 +455,7 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
         <RationaleList>
           {[
             `기술적 분석 점수: ${signal.score}`,
-            `신뢰도: ${signal.confidence}%`,
+            `신뢰도: ${confidenceValue}%`,
             `우선순위: ${signal.priority}`,
             `시간대: ${signal.timeframe}`
           ].map((reason, index) => (
@@ -457,7 +487,7 @@ const TradingSignalCard: React.FC<TradingSignalCardProps> = ({
 
       <ActionSection>
         <ExecuteButton
-          signalType={isHoldSignal ? 'BUY' : signal.action as 'BUY' | 'SELL'}
+          $signalType={isHoldSignal ? 'BUY' : signal.action as 'BUY' | 'SELL'}
           $disabled={isExecuting || isExpired || !allChecklistCompleted || isHoldSignal}
           onClick={handleExecuteTrade}
         >

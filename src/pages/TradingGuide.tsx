@@ -167,13 +167,28 @@ const StatsSection = styled.div`
   `}
 `;
 
-const StatCard = styled.div`
-  background: ${({ theme }) => theme.colors.background.primary};
+const StatCard = styled.div<{ $isClickable?: boolean; $isActive?: boolean }>`
+  background: ${({ theme, $isActive }) => 
+    $isActive ? theme.colors.primary + '15' : theme.colors.background.primary};
   padding: 1rem;
   border-radius: ${({ theme }) => theme.borderRadius.MD};
   box-shadow: ${({ theme }) => theme.shadows.SM};
-  border: 1px solid ${({ theme }) => theme.colors.border.primary};
+  border: 1px solid ${({ theme, $isActive }) => 
+    $isActive ? theme.colors.primary + '40' : theme.colors.border.primary};
   text-align: center;
+  cursor: ${({ $isClickable }) => $isClickable ? 'pointer' : 'default'};
+  transition: all 0.2s ease;
+  
+  ${({ $isClickable, theme }) => $isClickable && `
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: ${theme.shadows.MD};
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  `}
   
   ${media.max.sm`
     padding: 0.75rem;
@@ -250,10 +265,19 @@ const TradingGuide: React.FC = () => {
     }
   }, [signals, isLoading]);
 
-  // 필터링된 신호들
-  const filteredSignals = signals?.filter(signal => 
-    selectedStrategy === 'all' || signal.timeframe === selectedStrategy
-  ) || [];
+  // 필터링 및 정렬된 신호들
+  const filteredSignals = signals?.filter(signal => {
+    if (selectedStrategy === 'all') return true;
+    if (selectedStrategy === 'BUY') return signal.action === 'BUY';
+    if (selectedStrategy === 'SELL') return signal.action === 'SELL';
+    if (selectedStrategy === 'HOLD') return signal.action === 'HOLD';
+    return signal.timeframe === selectedStrategy;
+  }) || [];
+
+  // 생성순서대로 정렬
+  const sortedSignals = filteredSignals.sort((a, b) => 
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
 
   // 통계 계산
   const totalSignals = signals?.length || 0;
@@ -385,38 +409,51 @@ const TradingGuide: React.FC = () => {
         </HeaderSection>
 
         <StatsSection>
-          <StatCard>
+          <StatCard 
+            $isClickable 
+            $isActive={selectedStrategy === 'all'}
+            onClick={() => setSelectedStrategy('all')}
+          >
             <StatValue>{totalSignals}</StatValue>
             <StatLabel>전체 신호</StatLabel>
           </StatCard>
-          <StatCard>
+          <StatCard 
+            $isClickable 
+            $isActive={selectedStrategy === 'BUY'}
+            onClick={() => setSelectedStrategy('BUY')}
+          >
             <StatValue style={{ color: '#10B981' }}>{buySignals}</StatValue>
             <StatLabel>매수 신호</StatLabel>
           </StatCard>
-          <StatCard>
+          <StatCard 
+            $isClickable 
+            $isActive={selectedStrategy === 'SELL'}
+            onClick={() => setSelectedStrategy('SELL')}
+          >
             <StatValue style={{ color: '#EF4444' }}>{sellSignals}</StatValue>
             <StatLabel>매도 신호</StatLabel>
           </StatCard>
-          <StatCard>
+          <StatCard 
+            $isClickable 
+            $isActive={selectedStrategy === 'HOLD'}
+            onClick={() => setSelectedStrategy('HOLD')}
+          >
             <StatValue style={{ color: '#F59E0B' }}>{holdSignals}</StatValue>
             <StatLabel>관망 신호</StatLabel>
           </StatCard>
         </StatsSection>
 
-        {filteredSignals.length === 0 ? (
+        {sortedSignals.length === 0 ? (
           <EmptyState>
             <EmptyStateIcon>📊</EmptyStateIcon>
             <EmptyStateTitle>매매 신호가 없습니다</EmptyStateTitle>
             <EmptyStateText>
-              {selectedStrategy === 'all' 
-                ? '현재 활성화된 매매 신호가 없습니다. 잠시 후 다시 확인해주세요.'
-                : `${selectedStrategy} 전략에 해당하는 신호가 없습니다.`
-              }
+              현재 활성화된 매매 신호가 없습니다. 잠시 후 다시 확인해주세요.
             </EmptyStateText>
           </EmptyState>
         ) : (
           <SignalsList>
-            {filteredSignals.map((signal) => (
+            {sortedSignals.map((signal) => (
               <CompactTradingSignalCard
                 key={signal.id}
                 signal={signal}

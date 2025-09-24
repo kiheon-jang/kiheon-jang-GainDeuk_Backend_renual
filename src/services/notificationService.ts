@@ -131,6 +131,21 @@ class NotificationService {
     return content;
   }
 
+  private isDarkMode(): boolean {
+    try {
+      // HTML 요소의 클래스나 CSS 변수로 다크 모드 감지
+      if (typeof document !== 'undefined') {
+        const htmlElement = document.documentElement;
+        return htmlElement.classList.contains('dark') || 
+               htmlElement.style.colorScheme === 'dark' ||
+               window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
   // 공개 메서드들
   public show(notification: Omit<NotificationData, 'id' | 'timestamp'>): string {
     if (!this.settings.enabled) return '';
@@ -152,6 +167,7 @@ class NotificationService {
     // 토스트 표시
     const config = NOTIFICATION_TYPE_CONFIG[notification.type];
     const duration = notification.duration ?? config.duration ?? this.settings.duration;
+    const isDark = this.isDarkMode();
 
     const toastId = toast(
       this.createToastContent(fullNotification),
@@ -160,16 +176,22 @@ class NotificationService {
         duration,
         position: this.settings.position,
         style: {
-          background: '#FFFFFF',
+          background: isDark ? '#1F2937' : '#FFFFFF',
+          color: isDark ? '#F9FAFB' : '#1F2937',
           border: `2px solid ${config.color}`,
           borderRadius: '12px',
-          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+          boxShadow: isDark 
+            ? '0 10px 25px rgba(0, 0, 0, 0.3)' 
+            : '0 10px 25px rgba(0, 0, 0, 0.1)',
           padding: '16px',
           maxWidth: '420px',
+          fontSize: '14px',
+          fontWeight: '500',
+          lineHeight: '1.5',
         },
         iconTheme: {
           primary: config.color,
-          secondary: '#FFFFFF',
+          secondary: isDark ? '#1F2937' : '#FFFFFF',
         },
       }
     );

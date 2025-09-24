@@ -505,6 +505,114 @@ class ApiClient {
       throw error;
     }
   }
+
+  // 시그널 데이터 대시보드용 데이터 조회
+  async getSignalDashboardData(): Promise<any> {
+    try {
+      // 여러 API를 병렬로 호출하여 시그널 계산에 사용되는 데이터들을 수집
+      const [
+        signalsResponse,
+        coinsResponse,
+        newsResponse,
+        socialMediaResponse
+      ] = await Promise.allSettled([
+        this.client.get<ApiResponse<any[]>>('/signals', { params: { limit: 10 } }),
+        this.client.get<ApiResponse<any[]>>('/coins', { params: { limit: 1 } }),
+        this.client.get<ApiResponse<any>>('/news', { params: { limit: 5 } }),
+        this.client.get<ApiResponse<any>>('/social-media/data')
+      ]);
+
+      // 응답 데이터 처리
+      const signals = signalsResponse.status === 'fulfilled' ? signalsResponse.value.data.data : [];
+      const coins = coinsResponse.status === 'fulfilled' ? coinsResponse.value.data.data : [];
+      const news = newsResponse.status === 'fulfilled' ? newsResponse.value.data.data : null;
+      const socialMedia = socialMediaResponse.status === 'fulfilled' ? socialMediaResponse.value.data.data : null;
+
+      console.log('API Responses:', {
+        signals: signals.length,
+        coins: coins.length,
+        news,
+        socialMedia
+      });
+
+      // 첫 번째 코인 데이터 (BTC) 사용
+      const btcData = coins[0] || {
+        currentPrice: 43250.50,
+        priceChange: { '1h': 1.25, '24h': -2.15, '7d': 8.75, '30d': 15.30 },
+        marketCap: 850000000000,
+        totalVolume: 25000000000,
+        marketCapRank: 1
+      };
+
+      // 시그널 데이터에서 breakdown 정보 추출
+      const signalBreakdown = signals[0]?.breakdown || {
+        price: 65,
+        volume: 70,
+        market: 60,
+        sentiment: 72,
+        whale: 75
+      };
+
+      // 시그널 메타데이터에서 추가 정보 추출
+      const signalMetadata = signals[0]?.metadata || {};
+
+      // 대시보드 데이터 구성
+      const dashboardData = {
+        priceData: {
+          current: btcData.currentPrice,
+          change1h: btcData.priceChange?.['1h'] || 0,
+          change24h: btcData.priceChange?.['24h'] || 0,
+          change7d: btcData.priceChange?.['7d'] || 0,
+          change30d: btcData.priceChange?.['30d'] || 0
+        },
+        volumeData: {
+          ratio: signalMetadata.volumeRatio || 2.3,
+          change24h: 45.2, // 실제로는 계산 필요
+          average: 1.8
+        },
+        marketData: {
+          dominance: signalMetadata.correlation?.marketDominance || 42.5,
+          phase: signalMetadata.correlation?.altcoinSeason ? 'ALTCOIN_SEASON' : 'BTC_DOMINANT',
+          totalMarketCap: btcData.marketCap || 1650000000000
+        },
+        sentimentData: {
+          fearGreedIndex: signalMetadata.correlation?.fearGreedIndex || 65,
+          sentiment: this.getSentimentFromIndex(signalMetadata.correlation?.fearGreedIndex || 65),
+          newsSentiment: signalBreakdown.sentiment,
+          socialSentiment: 68
+        },
+        whaleData: {
+          activityScore: signalBreakdown.whale,
+          largeTransactions: 12,
+          totalVolume: '$2.4B',
+          averageTransactionSize: '$200K'
+        },
+        technicalData: {
+          volatility: signalMetadata.volatility || 18.5,
+          rsi: 58,
+          macd: 0.15,
+          bollinger: 0.85
+        },
+        lastUpdated: new Date().toISOString(),
+        newsItems: [] // news API 응답 구조가 다르므로 빈 배열로 설정
+      };
+
+      return dashboardData;
+    } catch (error) {
+      console.error('Failed to fetch signal dashboard data:', error);
+      throw error;
+    }
+  }
+
+  // 공포탐욕지수에서 감정 상태 추출
+  private getSentimentFromIndex(index: number): 'extreme_fear' | 'fear' | 'neutral' | 'greed' | 'extreme_greed' {
+    if (index >= 75) return 'extreme_greed';
+    if (index >= 55) return 'greed';
+    if (index >= 45) return 'neutral';
+    if (index >= 25) return 'fear';
+    return 'extreme_fear';
+  }
+
 }
 
 // API 클라이언트 인스턴스 생성 및 내보내기
@@ -536,6 +644,7 @@ export const api = {
   stopSocialMediaMonitoring: () => apiClient.stopSocialMediaMonitoring(),
   getSocialMediaData: () => apiClient.getSocialMediaData(),
   getNewsData: (limit?: number) => apiClient.getNewsData(limit),
+  getSignalDashboardData: () => apiClient.getSignalDashboardData(),
 };
 
 export default apiClient;

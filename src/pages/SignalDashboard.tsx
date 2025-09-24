@@ -9,8 +9,7 @@ import MarketSentimentCard from '@/components/cards/MarketSentimentCard';
 import TechnicalAnalysisCard from '@/components/cards/TechnicalAnalysisCard';
 import WhaleActivityCard from '@/components/cards/WhaleActivityCard';
 import { useRealTimeData, useNetworkStatus } from '@/hooks/useRealTimeData';
-import { api } from '@/services/api';
-import { media } from '@/utils/responsive';
+import { media, responsiveTypography, responsiveSpacing } from '@/utils/responsive';
 
 // 애니메이션 정의
 const fadeIn = keyframes`
@@ -18,12 +17,17 @@ const fadeIn = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
+const slideIn = keyframes`
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+`;
 
 const pulse = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 `;
 
+// 스타일드 컴포넌트
 const DashboardContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -66,36 +70,19 @@ const HeaderContent = styled.div`
 `;
 
 const HeaderTitle = styled.h1`
-  font-size: 2.5rem;
+  ${responsiveTypography.h1}
   font-weight: 800;
   margin: 0 0 1rem 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  
-  ${media.min.md} {
-    font-size: 2rem;
-  }
-  
-  ${media.min.sm} {
-    font-size: 1.75rem;
-  }
 `;
 
 const HeaderDescription = styled.p`
-  font-size: 1.1rem;
-  line-height: 1.6;
+  ${responsiveTypography.body}
   margin: 0 0 1.5rem 0;
   opacity: 0.9;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  
-  ${media.min.md} {
-    font-size: 1rem;
-  }
-  
-  ${media.min.sm} {
-    font-size: 0.9rem;
-  }
 `;
 
 const StatusGrid = styled.div`
@@ -158,6 +145,11 @@ const ContentGrid = styled.div`
   ${media.max.sm`
     gap: 1rem;
   `}
+`;
+
+const FullWidthCard = styled.div`
+  grid-column: 1 / -1;
+  animation: ${slideIn} 0.8s ease-out;
 `;
 
 const ErrorMessage = styled.div`
@@ -235,16 +227,9 @@ interface SignalDashboardData {
     bollinger: number;
   };
   lastUpdated: string;
-  newsItems?: Array<{
-    id: string;
-    title: string;
-    sentiment: 'positive' | 'negative' | 'neutral';
-    source: string;
-    publishedAt: string;
-  }>;
 }
 
-const Dashboard: React.FC = () => {
+const SignalDashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<SignalDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -256,21 +241,58 @@ const Dashboard: React.FC = () => {
   const { isOnline, connectionType } = useNetworkStatus();
 
   // 데이터 로드 함수
-  const loadDashboardData = async (showNotification = false) => {
+  const loadDashboardData = async () => {
     try {
       setIsRefreshing(true);
       setError(null);
       
-      // 실제 API 호출
-      const data = await api.getSignalDashboardData();
+      // 실제 API 호출 대신 모의 데이터 생성
+      // 실제 구현에서는 백엔드 API를 호출하여 시그널 계산에 사용되는 데이터들을 가져옴
+      const mockData: SignalDashboardData = {
+        priceData: {
+          current: 43250.50,
+          change1h: 1.25,
+          change24h: -2.15,
+          change7d: 8.75,
+          change30d: 15.30
+        },
+        volumeData: {
+          ratio: 2.3,
+          change24h: 45.2,
+          average: 1.8
+        },
+        marketData: {
+          dominance: 42.5,
+          phase: 'ALTCOIN_SEASON',
+          totalMarketCap: 1650000000000
+        },
+        sentimentData: {
+          fearGreedIndex: 65,
+          sentiment: 'greed',
+          newsSentiment: 72,
+          socialSentiment: 68
+        },
+        whaleData: {
+          activityScore: 75,
+          largeTransactions: 12,
+          totalVolume: '$2.4B',
+          averageTransactionSize: '$200K'
+        },
+        technicalData: {
+          volatility: 18.5,
+          rsi: 58,
+          macd: 0.15,
+          bollinger: 0.85
+        },
+        lastUpdated: new Date().toISOString()
+      };
       
-      setDashboardData(data);
+      // 실제 API 호출 시뮬레이션
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setDashboardData(mockData);
       setLastUpdateTime(new Date());
-      
-      // 수동 새로고침 시에만 노티피케이션 표시
-      if (showNotification) {
-        notify.success('데이터 업데이트', '시그널 데이터가 성공적으로 업데이트되었습니다.');
-      }
+      notify.success('데이터 업데이트', '시그널 데이터가 성공적으로 업데이트되었습니다.');
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.';
@@ -308,7 +330,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (isOnline && !isRefreshing) {
-        loadDashboardData(false); // 자동 새로고침 시에는 노티피케이션 표시하지 않음
+        loadDashboardData();
       }
     }, 30000);
 
@@ -316,7 +338,7 @@ const Dashboard: React.FC = () => {
   }, [isOnline, isRefreshing]);
 
   const handleRefresh = () => {
-    loadDashboardData(true); // 수동 새로고침 시에는 노티피케이션 표시
+    loadDashboardData();
   };
 
   if (isLoading) {
@@ -443,25 +465,25 @@ const Dashboard: React.FC = () => {
             sentiment={dashboardData.sentimentData.sentiment}
             btcDominance={dashboardData.marketData.dominance}
             marketPhase={dashboardData.marketData.phase}
-            newsItems={(dashboardData.newsItems && dashboardData.newsItems.length > 0) ? dashboardData.newsItems : [
+            newsItems={[
               {
                 id: '1',
                 title: '비트코인 ETF 승인 기대감 확산',
-                sentiment: 'positive' as const,
+                sentiment: 'positive',
                 source: 'CoinDesk',
                 publishedAt: new Date().toISOString()
               },
               {
                 id: '2',
                 title: '연준 금리 인상 가능성 언급',
-                sentiment: 'negative' as const,
+                sentiment: 'negative',
                 source: 'Reuters',
                 publishedAt: new Date().toISOString()
               },
               {
                 id: '3',
                 title: '기관 투자자 암호화폐 관심 증가',
-                sentiment: 'positive' as const,
+                sentiment: 'positive',
                 source: 'Bloomberg',
                 publishedAt: new Date().toISOString()
               }
@@ -544,4 +566,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default SignalDashboard;

@@ -188,7 +188,15 @@ class ApiClient {
         timeframe: signal.timeframe,
         priority: signal.priority,
         score: signal.finalScore,
-        createdAt: signal.createdAt
+        createdAt: signal.createdAt,
+        // 추가 필드들 매핑
+        finalScore: signal.finalScore,
+        breakdown: signal.breakdown,
+        recommendation: signal.recommendation,
+        metadata: signal.metadata,
+        marketCap: signal.marketCap,
+        rank: signal.rank,
+        updatedAt: signal.updatedAt
       }));
     } catch (error) {
       console.error('Failed to fetch trading signals:', error);
@@ -205,16 +213,47 @@ class ApiClient {
       const signal = response.data.data;
       return {
         id: signal._id,
-        coinId: signal.coinId,
-        symbol: signal.symbol,
-        name: signal.name,
-        action: signal.recommendation.action,
-        confidence: signal.recommendation.confidence,
-        price: signal.currentPrice,
-        timeframe: signal.timeframe,
-        priority: signal.priority,
-        score: signal.finalScore,
-        createdAt: signal.createdAt
+        coin: {
+          id: signal.coinId,
+          symbol: signal.symbol,
+          name: signal.name,
+          currentPrice: signal.currentPrice,
+          change24h: signal.metadata?.priceData?.change_24h || 0,
+          image: '',
+        },
+        signal: {
+          action: signal.recommendation.action,
+          strength: signal.recommendation.confidence === 'HIGH' ? 'STRONG' : 'MEDIUM',
+          confidence: signal.finalScore,
+        },
+        targets: {
+          entryPrice: signal.currentPrice,
+          targetPrice: signal.currentPrice * 1.1,
+          stopLoss: signal.currentPrice * 0.95,
+          takeProfit: signal.currentPrice * 1.2,
+          positionSize: 100000,
+          positionSizePercentage: 10,
+          maxRiskAmount: 5000,
+        },
+        timeframe: {
+          strategy: 'DAY_TRADING',
+          duration: signal.timeframe,
+          validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        },
+        reasons: {
+          technical: [`점수: ${signal.finalScore}/100`],
+          fundamental: [`우선순위: ${signal.priority}`],
+          sentiment: [],
+          news: [],
+        },
+        checklist: [
+          { id: '1', text: '시장 상황 확인', completed: false },
+          { id: '2', text: '리스크 관리', completed: false },
+          { id: '3', text: '포지션 크기 결정', completed: false },
+        ],
+        riskLevel: 3,
+        expectedReturn: 10,
+        maxLoss: 5,
       };
     } catch (error) {
       console.error('Failed to fetch trading signal detail:', error);
@@ -371,6 +410,101 @@ class ApiClient {
       throw error;
     }
   }
+
+  // 백테스팅 실행
+  async runBacktest(startDate: string, endDate: string, initialCapital: number = 10000): Promise<any> {
+    try {
+      const response = await this.client.post<ApiResponse<any>>('/signals/backtest', {
+        startDate,
+        endDate,
+        initialCapital
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to run backtest:', error);
+      throw error;
+    }
+  }
+
+  // 성과 리포트 조회
+  async getPerformanceReport(): Promise<any> {
+    try {
+      const response = await this.client.get<ApiResponse<any>>('/signals/performance-report');
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch performance report:', error);
+      throw error;
+    }
+  }
+
+  // 중복 신호 정리
+  async cleanupDuplicateSignals(coinId?: string): Promise<any> {
+    try {
+      const params = coinId ? { coinId } : {};
+      const response = await this.client.post<ApiResponse<any>>('/signals/cleanup-duplicates', null, { params });
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to cleanup duplicate signals:', error);
+      throw error;
+    }
+  }
+
+  // 뉴스 수집 및 감정분석 수동 실행
+  async collectNews(): Promise<any> {
+    try {
+      const response = await this.client.post<ApiResponse<any>>('/news/collect');
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to collect news:', error);
+      throw error;
+    }
+  }
+
+  // 소셜미디어 모니터링 시작
+  async startSocialMediaMonitoring(): Promise<any> {
+    try {
+      const response = await this.client.post<ApiResponse<any>>('/social-media/start');
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to start social media monitoring:', error);
+      throw error;
+    }
+  }
+
+  // 소셜미디어 모니터링 중지
+  async stopSocialMediaMonitoring(): Promise<any> {
+    try {
+      const response = await this.client.post<ApiResponse<any>>('/social-media/stop');
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to stop social media monitoring:', error);
+      throw error;
+    }
+  }
+
+  // 소셜미디어 데이터 조회
+  async getSocialMediaData(): Promise<any> {
+    try {
+      const response = await this.client.get<ApiResponse<any>>('/social-media/data');
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch social media data:', error);
+      throw error;
+    }
+  }
+
+  // 뉴스 데이터 조회
+  async getNewsData(limit: number = 20): Promise<any> {
+    try {
+      const response = await this.client.get<ApiResponse<any>>('/news', {
+        params: { limit }
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Failed to fetch news data:', error);
+      throw error;
+    }
+  }
 }
 
 // API 클라이언트 인스턴스 생성 및 내보내기
@@ -392,6 +526,16 @@ export const api = {
   saveUserProfile: (profile: UserProfile) => apiClient.saveUserProfile(profile),
   getUserProfile: (userId: string) => apiClient.getUserProfile(userId),
   healthCheck: () => apiClient.healthCheck(),
+  // 새로운 백엔드 기능들
+  runBacktest: (startDate: string, endDate: string, initialCapital?: number) => 
+    apiClient.runBacktest(startDate, endDate, initialCapital),
+  getPerformanceReport: () => apiClient.getPerformanceReport(),
+  cleanupDuplicateSignals: (coinId?: string) => apiClient.cleanupDuplicateSignals(coinId),
+  collectNews: () => apiClient.collectNews(),
+  startSocialMediaMonitoring: () => apiClient.startSocialMediaMonitoring(),
+  stopSocialMediaMonitoring: () => apiClient.stopSocialMediaMonitoring(),
+  getSocialMediaData: () => apiClient.getSocialMediaData(),
+  getNewsData: (limit?: number) => apiClient.getNewsData(limit),
 };
 
 export default apiClient;

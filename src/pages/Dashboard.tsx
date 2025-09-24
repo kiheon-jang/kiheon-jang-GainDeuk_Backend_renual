@@ -102,6 +102,7 @@ const Dashboard: React.FC = () => {
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   
+  
   // 실시간 데이터 및 네트워크 상태 훅
   const { startDashboardUpdates, stopRealTimeUpdates } = useRealTimeData();
   const { isOnline, connectionType } = useNetworkStatus();
@@ -129,6 +130,8 @@ const Dashboard: React.FC = () => {
       setLastUpdateTime(new Date());
     }
   }, [dashboardData, isLoading]);
+
+
 
   const handleAddToWatchlist = (coinId: string) => {
     setWatchlist(prev => {
@@ -232,6 +235,7 @@ const Dashboard: React.FC = () => {
             </RecommendationsGrid>
           </>
         )}
+
 
         {/* 하단 정보 섹션 */}
         <ContentGrid>

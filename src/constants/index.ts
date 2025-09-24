@@ -6,8 +6,7 @@ export const ROUTES = {
   HOME: '/',
   DASHBOARD: '/',
   TRADING: '/trading',
-  PROFILE: '/profile',
-  COINS: '/coins',
+  BACKTEST: '/backtest',
   SETTINGS: '/settings',
 } as const;
 

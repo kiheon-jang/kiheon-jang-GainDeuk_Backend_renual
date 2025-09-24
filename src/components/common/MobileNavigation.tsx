@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Home, TrendingUp, User, Coins, Settings } from 'lucide-react';
+import { Home, TrendingUp, Settings, BarChart3 } from 'lucide-react';
 import { ROUTES } from '@/constants';
 import { media, touchFriendly } from '@/utils/responsive';
 
@@ -52,22 +52,33 @@ const NavItem = styled.li<{ $isActive?: boolean }>`
   justify-content: center;
   flex: 1;
   cursor: pointer;
-  transition: ${({ theme }) => theme.transitions.FAST};
-  border-radius: ${({ theme }) => theme.borderRadius.MD};
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   margin: 0 0.25rem;
-  padding: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  position: relative;
+  transform: translateY(0);
   
-  ${({ $isActive, theme }) => $isActive && `
-    background: ${theme.colors.primary}15;
-    color: ${theme.colors.primary};
-  `}
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: ${({ $isActive }) => $isActive ? '32px' : '0px'};
+    height: 3px;
+    background: ${({ theme }) => theme.colors.primary};
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: ${({ $isActive }) => $isActive ? '1' : '0'};
+  }
   
   &:hover {
-    background: ${({ theme }) => theme.colors.gray[50]};
+    transform: translateY(-2px);
   }
   
   &:active {
-    transform: scale(0.95);
+    transform: translateY(0);
+    transition: transform 0.1s ease;
   }
 `;
 
@@ -78,22 +89,25 @@ const NavIcon = styled.div<{ $isActive?: boolean }>`
   margin-bottom: 0.25rem;
   color: ${({ theme, $isActive }) => 
     $isActive ? theme.colors.primary : theme.colors.text.secondary};
-  transition: ${({ theme }) => theme.transitions.FAST};
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(1);
   
   svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 `;
 
 const NavLabel = styled.span<{ $isActive?: boolean }>`
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: ${({ $isActive }) => $isActive ? '600' : '500'};
   color: ${({ theme, $isActive }) => 
     $isActive ? theme.colors.primary : theme.colors.text.secondary};
-  transition: ${({ theme }) => theme.transitions.FAST};
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   line-height: 1;
+  transform: scale(1);
 `;
 
 const NavItemComponent: React.FC<NavItemProps> = ({ 
@@ -143,14 +157,9 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
       path: ROUTES.TRADING,
     },
     {
-      icon: <User size={20} />,
-      label: '내성향',
-      path: ROUTES.PROFILE,
-    },
-    {
-      icon: <Coins size={20} />,
-      label: '코인목록',
-      path: ROUTES.COINS,
+      icon: <BarChart3 size={20} />,
+      label: '백테스팅',
+      path: ROUTES.BACKTEST,
     },
     {
       icon: <Settings size={20} />,

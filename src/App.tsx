@@ -15,8 +15,7 @@ import { updateExchangeRate } from '@/utils';
 // Lazy load pages for code splitting
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const TradingGuide = lazy(() => import('@/pages/TradingGuide'));
-const ProfileAnalysis = lazy(() => import('@/pages/ProfileAnalysis'));
-const CoinList = lazy(() => import('@/pages/CoinList'));
+const Backtest = lazy(() => import('@/pages/Backtest'));
 const Settings = lazy(() => import('@/pages/Settings'));
 
 // Global styles
@@ -58,11 +57,9 @@ const App: React.FC = () => {
               {/* 실시간 매매 가이드 */}
               <Route path="/trading" element={<TradingGuide />} />
               
-              {/* 내 성향 분석 */}
-              <Route path="/profile" element={<ProfileAnalysis />} />
+              {/* 백테스팅 */}
+              <Route path="/backtest" element={<Backtest />} />
               
-              {/* 코인 목록 */}
-              <Route path="/coins" element={<CoinList />} />
               
               {/* 설정 */}
               <Route path="/settings" element={<Settings />} />

@@ -3,7 +3,9 @@ import { notify } from '@/services/notificationService';
 import { api } from '@/services/api';
 import { QUERY_KEYS, invalidateQueries } from '@/services/queryClient';
 import type { 
-  UserProfile
+  UserProfile,
+  BacktestResult,
+  PerformanceReport
 } from '@/types';
 
 // 대시보드 데이터 훅
@@ -186,6 +188,119 @@ export const useHealthCheck = () => {
     refetchInterval: 30000, // 30초마다 새로고침
     staleTime: 10000, // 10초간 캐시 유지
     retry: 1, // 1번만 재시도
+  });
+};
+
+// 백테스팅 실행 훅
+export const useRunBacktest = () => {
+  return useMutation({
+    mutationFn: ({ startDate, endDate, initialCapital = 10000 }: { 
+      startDate: string; 
+      endDate: string; 
+      initialCapital?: number 
+    }) => api.runBacktest(startDate, endDate, initialCapital),
+    onSuccess: (data) => {
+      notify.success('백테스팅 완료', '백테스팅이 성공적으로 완료되었습니다!');
+      console.log('Backtest completed successfully:', data);
+    },
+    onError: (error) => {
+      notify.error('백테스팅 오류', '백테스팅 실행 중 오류가 발생했습니다.');
+      console.error('Backtest error:', error);
+    },
+  });
+};
+
+// 성과 리포트 조회 훅
+export const usePerformanceReport = () => {
+  return useQuery({
+    queryKey: ['performance-report'],
+    queryFn: () => api.getPerformanceReport(),
+    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+    refetchOnWindowFocus: false,
+  });
+};
+
+// 중복 신호 정리 훅
+export const useCleanupDuplicateSignals = () => {
+  return useMutation({
+    mutationFn: (coinId?: string) => api.cleanupDuplicateSignals(coinId),
+    onSuccess: (data) => {
+      // 중복 정리 완료 시 관련 쿼리들 새로고침
+      invalidateQueries.tradingSignals();
+      invalidateQueries.dashboard();
+      
+      notify.success('중복 정리 완료', '중복 신호가 정리되었습니다!');
+      console.log('Duplicate signals cleaned up successfully:', data);
+    },
+    onError: (error) => {
+      notify.error('중복 정리 오류', '중복 신호 정리 중 오류가 발생했습니다.');
+      console.error('Duplicate cleanup error:', error);
+    },
+  });
+};
+
+// 뉴스 수집 훅
+export const useCollectNews = () => {
+  return useMutation({
+    mutationFn: () => api.collectNews(),
+    onSuccess: (data) => {
+      notify.success('뉴스 수집 완료', '최신 뉴스가 수집되었습니다!');
+      console.log('News collected successfully:', data);
+    },
+    onError: (error) => {
+      notify.error('뉴스 수집 오류', '뉴스 수집 중 오류가 발생했습니다.');
+      console.error('News collection error:', error);
+    },
+  });
+};
+
+// 소셜미디어 모니터링 시작 훅
+export const useStartSocialMediaMonitoring = () => {
+  return useMutation({
+    mutationFn: () => api.startSocialMediaMonitoring(),
+    onSuccess: (data) => {
+      notify.success('모니터링 시작', '소셜미디어 모니터링이 시작되었습니다!');
+      console.log('Social media monitoring started successfully:', data);
+    },
+    onError: (error) => {
+      notify.error('모니터링 시작 오류', '소셜미디어 모니터링 시작 중 오류가 발생했습니다.');
+      console.error('Social media monitoring start error:', error);
+    },
+  });
+};
+
+// 소셜미디어 모니터링 중지 훅
+export const useStopSocialMediaMonitoring = () => {
+  return useMutation({
+    mutationFn: () => api.stopSocialMediaMonitoring(),
+    onSuccess: (data) => {
+      notify.success('모니터링 중지', '소셜미디어 모니터링이 중지되었습니다!');
+      console.log('Social media monitoring stopped successfully:', data);
+    },
+    onError: (error) => {
+      notify.error('모니터링 중지 오류', '소셜미디어 모니터링 중지 중 오류가 발생했습니다.');
+      console.error('Social media monitoring stop error:', error);
+    },
+  });
+};
+
+// 소셜미디어 데이터 조회 훅
+export const useSocialMediaData = () => {
+  return useQuery({
+    queryKey: ['social-media-data'],
+    queryFn: () => api.getSocialMediaData(),
+    refetchInterval: 30000, // 30초마다 새로고침
+    staleTime: 15000, // 15초간 캐시 유지
+  });
+};
+
+// 뉴스 데이터 조회 훅
+export const useNewsData = (limit?: number) => {
+  return useQuery({
+    queryKey: ['news-data', limit],
+    queryFn: () => api.getNewsData(limit),
+    refetchInterval: 60000, // 1분마다 새로고침
+    staleTime: 30000, // 30초간 캐시 유지
   });
 };
 

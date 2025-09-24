@@ -576,7 +576,9 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
           </InfoItem>
           <InfoItem>
             <InfoLabel>예상수익률</InfoLabel>
-            <ExpectedReturn>+15%</ExpectedReturn>
+            <ExpectedReturn style={{ color: signal.action === 'SELL' ? '#EF4444' : '#10B981' }}>
+              {signal.action === 'SELL' ? '-' : '+'}{Math.round((signal.score - 50) * 0.4 + 5)}%
+            </ExpectedReturn>
           </InfoItem>
         </MiddleInfo>
 
@@ -635,15 +637,37 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
           <RiskInfo>
             <RiskItem>
               <RiskLabel>예상 수익률</RiskLabel>
-              <RiskValue $type="return">+15%</RiskValue>
+              <RiskValue $type="return" style={{ color: signal.action === 'SELL' ? '#F59E0B' : '#10B981' }}>
+                {signal.action === 'SELL' 
+                  ? `손실 방지 (${Math.round((signal.score - 50) * 0.4 + 5)}% 하락 예상)` 
+                  : `+${Math.round((signal.score - 50) * 0.4 + 5)}% (가격상승시 수익)`
+                }
+              </RiskValue>
             </RiskItem>
             <RiskItem>
-              <RiskLabel>최대 손실</RiskLabel>
-              <RiskValue $type="loss">-5%</RiskValue>
+              <RiskLabel>{signal.action === 'SELL' ? '매도 이유' : '최대 손실'}</RiskLabel>
+              <RiskValue $type="loss" style={{ color: signal.action === 'SELL' ? '#F59E0B' : '#EF4444' }}>
+                {signal.action === 'SELL' 
+                  ? (() => {
+                      const volatility = Math.abs((signal as any).metadata?.priceData?.change_24h || 0);
+                      if (volatility > 25) return '높은 변동률';
+                      if (volatility > 15) return '중간 변동률';
+                      return '낮은 변동률';
+                    })()
+                  : `-${Math.round(10 - (signal.score - 50) * 0.16)}% (가격하락시 손절)`
+                }
+              </RiskValue>
             </RiskItem>
             <RiskItem>
               <RiskLabel>위험도</RiskLabel>
-              <RiskValue $type="level">중간</RiskValue>
+              <RiskValue $type="level">{(() => {
+                const volatility = Math.abs((signal as any).metadata?.priceData?.change_24h || 0);
+                if (signal.score >= 80 && volatility < 10) return '낮음';
+                else if (signal.score >= 60 && volatility < 20) return '보통';
+                else if (signal.score < 50 || volatility > 30) return '높음';
+                else if (signal.score < 40 || volatility > 50) return '매우 높음';
+                return '보통';
+              })()}</RiskValue>
             </RiskItem>
           </RiskInfo>
 
@@ -654,16 +678,60 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
               AI 추천 이유
             </RationaleTitle>
             <RationaleList>
-              {[
-                `기술적 분석: ${signal.score}점으로 강한 매매 신호`,
-                `시장 동향: ${signal.timeframe} 전략에 최적화된 타이밍`,
-                `리스크 관리: ${signal.priority} 우선순위로 안전한 진입점`,
-                `AI 신뢰도: ${signal.confidence} 수준의 높은 정확도`
-              ].map((reason, index) => (
-                <RationaleItem key={`rationale-${index}-${reason.slice(0, 10)}`}>
-                  💡 {reason}
-                </RationaleItem>
-              ))}
+              {(() => {
+                const reasons = [];
+                const breakdown = (signal as any).breakdown;
+                const metadata = (signal as any).metadata;
+                
+                // 기술적 분석 이유
+                if (breakdown?.price && breakdown.price >= 70) {
+                  reasons.push(`가격 지표 우수 (${breakdown.price}점)`);
+                }
+                if (breakdown?.volume && breakdown.volume >= 80) {
+                  reasons.push(`거래량 급증 (${breakdown.volume}점)`);
+                }
+                if (metadata?.volumeRatio && metadata.volumeRatio > 2) {
+                  reasons.push(`거래량 비율 ${metadata.volumeRatio.toFixed(1)}배 증가`);
+                }
+                
+                // 시장 상황 이유
+                if (breakdown?.market && breakdown.market >= 60) {
+                  reasons.push(`시장 상황 양호 (${breakdown.market}점)`);
+                }
+                if (breakdown?.sentiment && breakdown.sentiment >= 60) {
+                  reasons.push(`시장 심리 긍정적 (${breakdown.sentiment}점)`);
+                }
+                
+                // 고래 활동 이유
+                if (metadata?.whaleActivity && metadata.whaleActivity > 60) {
+                  reasons.push(`고래 활동 증가 (${metadata.whaleActivity}점)`);
+                }
+                
+                // 가격 변동 이유
+                if (metadata?.priceData?.change_24h && metadata.priceData.change_24h > 0) {
+                  reasons.push(`24시간 상승률 ${metadata.priceData.change_24h.toFixed(1)}%`);
+                }
+                
+                // 우선순위 이유
+                if (signal.priority === 'high_priority') {
+                  reasons.push('높은 우선순위 신호');
+                }
+                
+                // 기본 이유 (위 조건들이 없을 때)
+                if (reasons.length === 0) {
+                  reasons.push(
+                    `AI 점수: ${signal.score}/100`,
+                    `${signal.timeframe} 전략에 최적화`,
+                    `${signal.confidence} 신뢰도 수준`
+                  );
+                }
+                
+                return reasons.map((reason, index) => (
+                  <RationaleItem key={`rationale-${index}-${reason.slice(0, 10)}`}>
+                    💡 {reason}
+                  </RationaleItem>
+                ));
+              })()}
             </RationaleList>
           </RationaleSection>
 
@@ -674,18 +742,25 @@ const CompactTradingSignalCard: React.FC<CompactTradingSignalCardProps> = ({
               매매 전 체크리스트
             </ChecklistTitle>
             <ChecklistList>
-              {[
-                '시장 상황 및 뉴스 확인',
-                '개인 투자 목표와 일치하는지 검토',
-                '리스크 관리 계획 수립',
-                '포지션 크기 결정',
-                '손절매/익절가 설정'
-              ].map((item, index) => (
-                <ChecklistItem key={`checklist-${index}-${item.slice(0, 10)}`} $completed={false}>
-                  <CheckCircle size={14} />
-                  {item}
-                </ChecklistItem>
-              ))}
+              {(() => {
+                const maxLoss = Math.round(10 - (signal.score - 50) * 0.16);
+                const positionSizePercentage = Math.min(20, Math.max(5, signal.score / 5));
+                const stopLossMultiplier = 1 - (maxLoss / 100);
+                const takeProfitMultiplier = 1 + ((Math.round((signal.score - 50) * 0.4 + 5)) * 1.5 / 100);
+                
+                return [
+                  '시장 상황 및 뉴스 확인',
+                  `리스크 관리 (최대 ${maxLoss}% 손실 한도)`,
+                  `포지션 크기 결정 (${positionSizePercentage}% 권장)`,
+                  `손절가 설정 (${(signal.price * stopLossMultiplier).toFixed(4)})`,
+                  `익절가 설정 (${(signal.price * takeProfitMultiplier).toFixed(4)})`
+                ].map((item, index) => (
+                  <ChecklistItem key={`checklist-${index}-${item.slice(0, 10)}`} $completed={false}>
+                    <CheckCircle size={14} />
+                    {item}
+                  </ChecklistItem>
+                ));
+              })()}
             </ChecklistList>
           </ChecklistSection>
 

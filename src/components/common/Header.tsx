@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Home, User, Settings, Menu } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { Home, TrendingUp, Settings, Menu, BarChart3 } from 'lucide-react';
 import { ROUTES } from '@/constants';
 import { media, responsiveTypography, touchFriendly } from '@/utils/responsive';
 
@@ -12,7 +13,8 @@ interface HeaderProps {
 const HeaderContainer = styled.header`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 2rem;
   padding: 1rem 1.5rem;
   background: ${({ theme }) => theme.colors.background.primary};
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.primary};
@@ -23,6 +25,7 @@ const HeaderContainer = styled.header`
   
   ${media.max.sm`
     padding: 0.75rem 1rem;
+    gap: 1rem;
   `}
 `;
 
@@ -60,7 +63,9 @@ const LogoIcon = styled.div`
 const Navigation = styled.nav`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
+  flex: 1;
+  max-width: 600px;
 
   ${media.max.md`
     display: none;
@@ -71,19 +76,50 @@ const NavItem = styled.a<{ $active?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: ${({ theme }) => theme.borderRadius.MD};
+  padding: 0.75rem 1rem;
   color: ${({ theme, $active }) => $active ? theme.colors.primary : theme.colors.text.secondary};
-  background: ${({ theme, $active }) => $active ? theme.colors.gray[50] : 'transparent'};
   text-decoration: none;
-  font-weight: 500;
-  transition: ${({ theme }) => theme.transitions.FAST};
+  font-weight: ${({ $active }) => $active ? '600' : '500'};
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transform: translateY(0);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: ${({ $active }) => $active ? '80%' : '0%'};
+    height: 2px;
+    background: ${({ theme }) => theme.colors.primary};
+    transform: translateX(-50%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 1px;
+    opacity: ${({ $active }) => $active ? '1' : '0'};
+  }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.primary};
-    background: ${({ theme }) => theme.colors.gray[50]};
+    transform: translateY(-1px);
   }
+
+  &:active {
+    transform: translateY(0);
+    transition: transform 0.1s ease;
+  }
+
+  ${media.max.lg`
+    padding: 0.6rem 0.8rem;
+    font-size: 0.875rem;
+  `}
+`;
+
+const RightSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
 `;
 
 const MobileMenuButton = styled.button`
@@ -109,6 +145,22 @@ const MobileMenuButton = styled.button`
 `;
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick, showMenuButton = true }) => {
+  const location = useLocation();
+  
+  const isActiveRoute = (path: string) => {
+    if (path === ROUTES.DASHBOARD) {
+      return location.pathname === '/' || location.pathname === ROUTES.DASHBOARD;
+    }
+    return location.pathname === path;
+  };
+
+  const navigationItems = [
+    { path: ROUTES.DASHBOARD, icon: <Home size={18} />, label: '대시보드' },
+    { path: ROUTES.TRADING, icon: <TrendingUp size={18} />, label: '매매 가이드' },
+    { path: ROUTES.BACKTEST, icon: <BarChart3 size={18} />, label: '백테스팅' },
+    { path: ROUTES.SETTINGS, icon: <Settings size={18} />, label: '설정' },
+  ];
+
   return (
     <HeaderContainer>
       <Logo>
@@ -117,33 +169,25 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, showMenuButton = true }) =
       </Logo>
       
       <Navigation>
-        <NavItem href={ROUTES.DASHBOARD}>
-          <Home size={18} />
-          대시보드
-        </NavItem>
-        <NavItem href={ROUTES.TRADING}>
-          <User size={18} />
-          매매 가이드
-        </NavItem>
-        <NavItem href={ROUTES.PROFILE}>
-          <User size={18} />
-          내 성향
-        </NavItem>
-        <NavItem href={ROUTES.COINS}>
-          <User size={18} />
-          코인 목록
-        </NavItem>
-        <NavItem href={ROUTES.SETTINGS}>
-          <Settings size={18} />
-          설정
-        </NavItem>
+        {navigationItems.map((item) => (
+          <NavItem 
+            key={item.path}
+            href={item.path}
+            $active={isActiveRoute(item.path)}
+          >
+            {item.icon}
+            {item.label}
+          </NavItem>
+        ))}
       </Navigation>
 
-      {showMenuButton && (
-        <MobileMenuButton onClick={onMenuClick}>
-          <Menu size={20} />
-        </MobileMenuButton>
-      )}
+      <RightSection>
+        {showMenuButton && (
+          <MobileMenuButton onClick={onMenuClick}>
+            <Menu size={20} />
+          </MobileMenuButton>
+        )}
+      </RightSection>
     </HeaderContainer>
   );
 };
